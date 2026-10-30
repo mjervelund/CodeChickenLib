@@ -1,12 +1,16 @@
 package codechicken.lib.inventory;
 
+import net.minecraft.util.Prediction;
+import net.minecraft.world.item.ItemStackTemplate;
 import codechicken.lib.util.ItemUtils;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 public class InventoryUtils {
 
@@ -88,7 +92,7 @@ public class InventoryUtils {
 
             var child = children.addChild();
             child.putInt("Slot", i);
-            child.store("Item", ItemStack.SINGLE_ITEM_CODEC, stack);
+            child.store("Item", ItemStack.CODEC, stack.copyWithCount(1));
             child.putInt("Quantity", Math.min(stack.getCount(), maxQuantity));
         }
     }
@@ -100,7 +104,7 @@ public class InventoryUtils {
         var children = input.childrenListOrEmpty("Items");
         for (ValueInput child : children) {
             var slot = child.getInt("Slot").orElseThrow();
-            items[slot] = child.read("Item", ItemStack.SINGLE_ITEM_CODEC).orElse(ItemStack.EMPTY);
+            items[slot] = child.read("Item", ItemStack.CODEC).orElse(ItemStack.EMPTY);
             if (!items[slot].isEmpty()) {
                 items[slot].setCount(child.getInt("Quantity").orElseThrow());
             }
@@ -212,9 +216,9 @@ public class InventoryUtils {
      */
     public static void consumeItem(Container inv, int slot) {
         ItemStack stack = inv.getItem(slot);
-        ItemStack remaining = stack.getCraftingRemainder();
-        if (!remaining.isEmpty()) {
-            inv.setItem(slot, remaining);
+        ItemStackTemplate remaining = stack.getCraftingRemainder();
+        if (remaining != null) {
+            inv.setItem(slot, remaining.create());
         } else {
             inv.removeItem(slot, 1);
         }
@@ -235,39 +239,42 @@ public class InventoryUtils {
         for (int i = 0; i < inv.getContainerSize(); i++) {
             ItemStack stack = inv.removeItemNoUpdate(i);
             if (!stack.isEmpty()) {
-                player.drop(stack, false);
+                player.drop(stack, false, Prediction.SERVER_ONLY);
             }
         }
     }
 
-    public static boolean canInsertStack(IItemHandler handler, int slot, ItemStack stack) {
-        return handler.insertItem(slot, stack, true) != stack;
-    }
-
-    public static boolean canExtractStack(IItemHandler handler, int slot) {
-        ItemStack stack = handler.getStackInSlot(slot);
-        if (!stack.isEmpty()) {
-            return !handler.extractItem(slot, stack.getMaxStackSize(), true).isEmpty();
+    // NeoForge 26.3 replaced IItemHandler with ResourceHandler<ItemResource> and transactions.
+    public static boolean canInsertStack(ResourceHandler<ItemResource> handler, int slot, ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        try (var tx = Transaction.openRoot()) {
+            return handler.insert(slot, ItemResource.of(stack), stack.getCount(), tx) > 0;
         }
-        return false;
     }
 
-    public static ItemStack insertItem(IItemHandler handler, ItemStack insert, boolean simulate) {
-        insert = insert.copy();
-        for (int pass = 0; pass < 2; pass++) {
-            for (int slot = 0; slot < handler.getSlots(); slot++) {
-                ItemStack stack = handler.getStackInSlot(slot);
-                if (pass == 0 && stack.isEmpty()) {
-                    continue;
+    public static boolean canExtractStack(ResourceHandler<ItemResource> handler, int slot) {
+        ItemResource resource = handler.getResource(slot);
+        if (resource.isEmpty()) return false;
+        try (var tx = Transaction.openRoot()) {
+            return handler.extract(slot, resource, resource.getMaxStackSize(), tx) > 0;
+        }
+    }
+
+    public static ItemStack insertItem(ResourceHandler<ItemResource> handler, ItemStack insert, boolean simulate) {
+        if (insert.isEmpty()) return ItemStack.EMPTY;
+        ItemResource resource = ItemResource.of(insert);
+        int remaining = insert.getCount();
+        try (var tx = Transaction.openRoot()) {
+            // First pass fills slots that already hold something, the second pass the empty ones.
+            for (int pass = 0; pass < 2 && remaining > 0; pass++) {
+                for (int slot = 0; slot < handler.size() && remaining > 0; slot++) {
+                    if (pass == 0 && handler.getResource(slot).isEmpty()) continue;
+                    remaining -= handler.insert(slot, resource, remaining, tx);
                 }
-                if (insert.isEmpty()) {
-                    return ItemStack.EMPTY;
-                }
-                insert = handler.insertItem(slot, insert, simulate);
             }
+            if (!simulate) tx.commit();
         }
-
-        return insert;
+        return insert.copyWithCount(remaining);
     }
 
     /**
@@ -279,28 +286,28 @@ public class InventoryUtils {
      * @param insert  If we are checking for insertion or extraction.
      * @return The total number of items of the specified filter type.
      */
-    public static int countMatchingStacks(IItemHandler handler, ItemStack filter, boolean insert) {
-
+    public static int countMatchingStacks(ResourceHandler<ItemResource> handler, ItemStack filter, boolean insert) {
         int c = 0;
-        for (int slot = 0; slot < handler.getSlots(); slot++) {
-            ItemStack stack = handler.getStackInSlot(slot);
-            if (!stack.isEmpty() && ItemUtils.areStacksSameType(filter, stack) && (insert ? canInsertStack(handler, slot, stack) : canExtractStack(handler, slot))) {
+        for (int slot = 0; slot < handler.size(); slot++) {
+            ItemResource resource = handler.getResource(slot);
+            if (resource.isEmpty()) continue;
+            ItemStack stack = resource.toStack(handler.getAmountAsInt(slot));
+            if (ItemUtils.areStacksSameType(filter, stack) && (insert ? canInsertStack(handler, slot, stack) : canExtractStack(handler, slot))) {
                 c += stack.getCount();
             }
         }
         return c;
     }
 
-    public static int getInsertableQuantity(IItemHandler handler, ItemStack stack) {
-        ItemStack copy = ItemUtils.copyStack(stack, Integer.MAX_VALUE);
+    public static int getInsertableQuantity(ResourceHandler<ItemResource> handler, ItemStack stack) {
+        if (stack.isEmpty()) return 0;
+        ItemResource resource = ItemResource.of(stack);
         int quantity = 0;
-        for (int slot = 0; slot < handler.getSlots(); slot++) {
-            if (canInsertStack(handler, slot, copy)) {
-                ItemStack left = handler.insertItem(slot, copy, true);
-                if (left.isEmpty()) {
-                    quantity += copy.getCount();
-                } else {
-                    quantity += copy.getCount() - left.getCount();
+        try (var tx = Transaction.openRoot()) {
+            for (int slot = 0; slot < handler.size(); slot++) {
+                // Each slot on its own, like the old per-slot simulated insert.
+                try (var inner = Transaction.open(tx)) {
+                    quantity += handler.insert(slot, resource, Integer.MAX_VALUE, inner);
                 }
             }
         }

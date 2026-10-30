@@ -1,11 +1,9 @@
 package codechicken.lib.inventory.container.modular;
 
 import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
 
 import java.util.function.*;
 
@@ -15,7 +13,9 @@ import java.util.function.*;
  * <p>
  * Created by brandon3055 on 10/09/2023
  */
-public class ModularSlot extends SlotItemHandler {
+// NeoForge 26.3 removed IItemHandler (and SlotItemHandler/InvWrapper); every user wraps a Container,
+// so this is a plain vanilla Slot now.
+public class ModularSlot extends Slot {
 
     private boolean canPlace = true;
     private boolean checkContainer = true;
@@ -26,19 +26,11 @@ public class ModularSlot extends SlotItemHandler {
     private BiConsumer<ItemStack, ItemStack> onSet = (oldStack, newStack) -> { };
 
     public ModularSlot(Container container, int index) {
-        this(new InvWrapper(container), index, 0, 0);
-    }
-
-    public ModularSlot(IItemHandler itemHandler, int index) {
-        this(itemHandler, index, 0, 0);
+        this(container, index, 0, 0);
     }
 
     public ModularSlot(Container container, int index, int xPos, int yPos) {
-        super(new InvWrapper(container), index, xPos, yPos);
-    }
-
-    public ModularSlot(IItemHandler itemHandler, int index, int xPos, int yPos) {
-        super(itemHandler, index, xPos, yPos);
+        super(container, index, xPos, yPos);
     }
 
     /**
@@ -106,7 +98,7 @@ public class ModularSlot extends SlotItemHandler {
 
     @Override
     public boolean mayPlace(ItemStack itemStack) {
-        return canPlace && validator.test(itemStack) && (!checkContainer || getItemHandler().isItemValid(getContainerSlot(), itemStack));
+        return canPlace && validator.test(itemStack) && (!checkContainer || container.canPlaceItem(getContainerSlot(), itemStack));
     }
 
     @Override

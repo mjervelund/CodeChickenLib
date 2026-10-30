@@ -1,5 +1,6 @@
 package codechicken.lib.render;
 
+import net.minecraft.util.LightCoordsUtil;
 import codechicken.lib.colour.Colour;
 import codechicken.lib.colour.ColourRGBA;
 import codechicken.lib.render.buffer.BakedQuadVertexBuilder;
@@ -278,7 +279,7 @@ public class CCRenderState {
     }
 
     public void setBrightness(BlockAndTintGetter world, BlockPos pos) {
-        brightness = LevelRenderer.getLightColor(world, pos);
+        brightness = LightCoordsUtil.getLightCoords(world, pos);
     }
 
     public void setBrightness(Entity entity, float frameDelta) {

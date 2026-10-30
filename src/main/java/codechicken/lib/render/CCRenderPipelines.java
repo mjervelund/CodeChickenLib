@@ -1,5 +1,7 @@
 package codechicken.lib.render;
 
+import com.mojang.renderpearl.api.pipeline.DepthStencilState;
+import com.mojang.renderpearl.api.pipeline.CompareOp;
 import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -23,14 +25,14 @@ public class CCRenderPipelines {
     public static final RenderPipeline POSITION_COLOR = RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
             .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
             .withPrimitiveTopology(PrimitiveTopology.QUADS)
-            .withDepthWrite(true) // Overwritten from DEBUG_FILLED_SNIPPET as we very much want depth here.
+            .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, true)) // Overwritten from DEBUG_FILLED_SNIPPET as we very much want depth here.
             .withLocation(Identifier.fromNamespaceAndPath(MOD_ID, "pipeline/position_color"))
             .build();
 
     public static final RenderPipeline POSITION_COLOR_NO_DEPTH = RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
             .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
             .withPrimitiveTopology(PrimitiveTopology.QUADS)
-            .withDepthWrite(false)
+            .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false))
             .withLocation(Identifier.fromNamespaceAndPath(MOD_ID, "pipeline/position_color_no_depth"))
             .build();
 }
