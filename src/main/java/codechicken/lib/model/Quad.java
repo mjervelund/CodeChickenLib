@@ -56,6 +56,11 @@ public class Quad {
     public boolean shade = false;
     public int lightEmission = 0;
     public boolean ambientOcclusion = true;
+    /**
+     * The material of the quad this was copied from, if any. Its chunk layer and item render types are kept
+     * when baking with the same sprite.
+     */
+    public BakedQuad.@Nullable MaterialInfo sourceMaterial;
 
     // Cache for normal computation.
     private final Vector3 v1 = new Vector3();
@@ -245,6 +250,7 @@ public class Quad {
         shade = material.shadeDirectionOverride() == null;
         lightEmission = material.lightEmission();
         ambientOcclusion = material.ambientOcclusion();
+        sourceMaterial = material;
         return this;
     }
 
@@ -264,6 +270,7 @@ public class Quad {
         shade = quad.shade;
         lightEmission = quad.lightEmission;
         ambientOcclusion = quad.ambientOcclusion;
+        sourceMaterial = quad.sourceMaterial;
         return this;
     }
 
@@ -274,14 +281,30 @@ public class Quad {
      */
     public BakedQuad bake() {
         TextureAtlasSprite sprite = requireNonNull(this.sprite, "Quad requires a sprite.");
-        BakedQuad.MaterialInfo material = BakedQuad.MaterialInfo.of(
-                new Material.Baked(sprite, false),
-                sprite.transparency(),
-                tintIndex,
-                shade ? null : Direction.UP,
-                lightEmission,
-                ambientOcclusion
-        );
+        BakedQuad.MaterialInfo src = sourceMaterial;
+        BakedQuad.MaterialInfo material;
+        if (src != null && src.sprite() == sprite) {
+            material = new BakedQuad.MaterialInfo(
+                    sprite,
+                    src.layer(),
+                    src.itemRenderType(),
+                    src.itemGlintRenderType(),
+                    src.itemGlintSpecialRenderType(),
+                    tintIndex,
+                    shade ? null : src.shadeDirectionOverride() != null ? src.shadeDirectionOverride() : Direction.UP,
+                    lightEmission,
+                    ambientOcclusion
+            );
+        } else {
+            material = BakedQuad.MaterialInfo.of(
+                    new Material.Baked(sprite, false),
+                    sprite.transparency(),
+                    tintIndex,
+                    shade ? null : Direction.UP,
+                    lightEmission,
+                    ambientOcclusion
+            );
+        }
         return new BakedQuad(
                 vertices[0].vec.vector3f(),
                 vertices[1].vec.vector3f(),
