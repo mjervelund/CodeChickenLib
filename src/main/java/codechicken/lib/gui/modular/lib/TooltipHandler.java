@@ -106,7 +106,7 @@ public interface TooltipHandler<T extends TooltipHandler<T>> {
         List<Component> list = supplier.get();
         if (list.isEmpty()) return false;
 
-        graphics.renderTooltip(
+        graphics.tooltip(
                 font,
                 FastStream.of(list)
                         //Run all components though split to account for newline characters in translations
@@ -117,7 +117,8 @@ public interface TooltipHandler<T extends TooltipHandler<T>> {
                 (int) mouseX,
                 (int) mouseY,
                 DefaultTooltipPositioner.INSTANCE,
-                null
+                null,
+                false
         );
         return true;
     }

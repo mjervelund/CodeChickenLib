@@ -355,7 +355,7 @@ public class ConfigValueListImpl extends AbstractConfigTag<ConfigValueList> impl
         if (type == ValueType.UNKNOWN) throw new IllegalStateException("Tried to write UNKNOWN tag to network");
         packet.writeEnum(type);
         switch (type) {
-            case STRING -> packet.writeCollection(getStrings(), ByteBufCodecs.STRING_UTF8);
+            case STRING -> packet.cc$writeWithCodec(ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()), getStrings());
             case BOOLEAN -> packet.cc$writeWithCodec(CCStreamCodecs.BOOLEAN_ARRAY, getBooleans().toBooleanArray());
             case INT -> packet.cc$writeWithCodec(CCStreamCodecs.INT_ARRAY, getInts().toIntArray());
             case LONG -> packet.cc$writeWithCodec(CCStreamCodecs.LONG_ARRAY, getLongs().toLongArray());
@@ -374,7 +374,7 @@ public class ConfigValueListImpl extends AbstractConfigTag<ConfigValueList> impl
         if (netType != type) throw new IllegalStateException("Tried to read a " + netType + " tag from the network into a " + type + " tag");
 
         switch (type) {
-            case STRING -> networkValue = packet.readList(ByteBufCodecs.STRING_UTF8);
+            case STRING -> networkValue = packet.cc$readWithCodec(ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list()));
             case BOOLEAN -> networkValue = new BooleanArrayList(packet.cc$readWithCodec(CCStreamCodecs.BOOLEAN_ARRAY));
             case INT, HEX -> networkValue = new IntArrayList(packet.cc$readWithCodec(CCStreamCodecs.INT_ARRAY));
             case LONG -> networkValue = new LongArrayList(packet.cc$readWithCodec(CCStreamCodecs.LONG_ARRAY));
