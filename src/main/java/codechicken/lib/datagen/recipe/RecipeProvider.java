@@ -1,5 +1,8 @@
 package codechicken.lib.datagen.recipe;
 
+import net.minecraft.core.HolderSet;
+import net.neoforged.neoforge.common.conditions.ConditionalOps;
+import com.mojang.serialization.Codec;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.triggers.CriteriaTriggers;
@@ -33,6 +36,10 @@ import java.util.function.Supplier;
  */
 public abstract class RecipeProvider implements DataProvider {
 
+    // Recipe/Advancement.CONDITIONAL_CODEC are gone in 26.3; build the same wrapped codecs here.
+    private static final Codec<Optional<WithConditions<Recipe<?>>>> RECIPE_CODEC = ConditionalOps.createConditionalCodecWithConditions(Recipe.DIRECT_CODEC);
+    private static final Codec<Optional<WithConditions<Advancement>>> ADVANCEMENT_CODEC = ConditionalOps.createConditionalCodecWithConditions(Advancement.CODEC);
+
     private final Map<Identifier, RecipeBuilder> recipes = new HashMap<>();
     private final CompletableFuture<HolderLookup.Provider> registries;
     private final PackOutput.PathProvider recipePath;
@@ -62,7 +69,7 @@ public abstract class RecipeProvider implements DataProvider {
             futures.add(DataProvider.saveStable(
                     cache,
                     registries,
-                    Recipe.CONDITIONAL_CODEC,
+                    RECIPE_CODEC,
                     Optional.of(new WithConditions<>(builtRecipe.conditions(), builtRecipe.recipe())),
                     recipePath.json(id)
             ));
@@ -72,7 +79,7 @@ public abstract class RecipeProvider implements DataProvider {
                 futures.add(DataProvider.saveStable(
                         cache,
                         registries,
-                        Advancement.CONDITIONAL_CODEC,
+                        ADVANCEMENT_CODEC,
                         Optional.of(new WithConditions<>(builtRecipe.conditions(), advancement.value())),
                         advancementPath.json(id)
                 ));
@@ -190,7 +197,7 @@ public abstract class RecipeProvider implements DataProvider {
     //@formatter:on
 
     protected Criterion<?> enteredBlock(Block blockIn) {
-        return CriteriaTriggers.ENTER_BLOCK.createCriterion(new EnterBlockTrigger.TriggerInstance(Optional.empty(), Optional.of(blockIn.builtInRegistryHolder()), Optional.empty()));
+        return CriteriaTriggers.ENTER_BLOCK.createCriterion(new EnterBlockTrigger.TriggerInstance(Optional.empty(), Optional.of(HolderSet.direct(blockIn.builtInRegistryHolder())), Optional.empty()));
     }
 
     protected Criterion<?> hasItem(ItemLike itemIn) {

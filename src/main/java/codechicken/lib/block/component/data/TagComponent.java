@@ -25,7 +25,7 @@ public class TagComponent extends DataGenComponent {
     @Override
     protected void addToProvider(DataProvider provider) {
         if (provider instanceof BlockTagsProvider p) {
-            p.tag(tag).add(getBlock());
+            p.tag(tag).add(getBlock().builtInRegistryHolder().key());
         }
     }
 }

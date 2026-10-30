@@ -1,5 +1,7 @@
 package codechicken.lib.datagen.recipe;
 
+import net.minecraft.core.HolderOwner;
+import net.minecraft.core.Holder;
 import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.advancements.*;
@@ -26,6 +28,15 @@ import static net.covers1624.quack.util.SneakyUtils.unsafeCast;
  * Created by covers1624 on 28/12/20.
  */
 public abstract class AbstractRecipeBuilder<R, T extends AbstractRecipeBuilder<R, T>> implements RecipeBuilder {
+
+    // 26.3's recipe_unlocked criterion takes recipe holders. This provider writes JSON directly with no recipe
+    // registry, so use a stand-alone reference that may be serialized anywhere; it encodes as the recipe id.
+    private static final HolderOwner<Recipe<?>> ANY_OWNER = new HolderOwner<>() {
+        @Override
+        public boolean canSerialize(HolderOwner<Recipe<?>> owner) {
+            return true;
+        }
+    };
 
     protected final Throwable created = new Throwable("Created at");
     protected final Advancement.Builder advancementBuilder = Advancement.Builder.advancement();
@@ -96,7 +107,7 @@ public abstract class AbstractRecipeBuilder<R, T extends AbstractRecipeBuilder<R
         validate();
         if (enableUnlocking) {
             advancementBuilder.parent(Identifier.withDefaultNamespace("recipes/root"))
-                    .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(getKey()))
+                    .addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(Holder.Reference.createStandAlone(ANY_OWNER, getKey())))
                     .rewards(AdvancementRewards.Builder.recipe(getKey()))
                     .requirements(AdvancementRequirements.Strategy.OR);
         }

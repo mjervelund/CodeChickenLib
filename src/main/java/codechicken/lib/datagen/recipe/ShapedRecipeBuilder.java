@@ -1,5 +1,8 @@
 package codechicken.lib.datagen.recipe;
 
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.Recipe;
 import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.chars.CharOpenHashSet;
@@ -67,7 +70,9 @@ public class ShapedRecipeBuilder extends AbstractItemStackRecipeBuilder<ShapedRe
     }
 
     public static ShapedRecipeBuilder builder(HolderGetter<Item> items, ItemStack result, Identifier id) {
-        return new ShapedRecipeBuilder(id, items, result, ShapedRecipe::new);
+        return new ShapedRecipeBuilder(id, items, result, (group, category, pattern, stack, showNotification) -> new ShapedRecipe(
+                new Recipe.CommonInfo(showNotification), new CraftingRecipe.CraftingBookInfo(category, group),
+                pattern, ItemStackTemplate.fromNonEmptyStack(stack)));
     }
 
     // region Custom

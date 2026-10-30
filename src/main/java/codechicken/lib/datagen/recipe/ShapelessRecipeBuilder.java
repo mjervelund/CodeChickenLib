@@ -1,5 +1,7 @@
 package codechicken.lib.datagen.recipe;
 
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -63,7 +65,9 @@ public class ShapelessRecipeBuilder extends AbstractItemStackRecipeBuilder<Shape
     }
 
     public static ShapelessRecipeBuilder builder(HolderGetter<Item> items, ItemStack result, Identifier id) {
-        return new ShapelessRecipeBuilder(id, items, result, ShapelessRecipe::new);
+        return new ShapelessRecipeBuilder(id, items, result, (group, category, stack, ingredients) -> new ShapelessRecipe(
+                new Recipe.CommonInfo(true), new CraftingRecipe.CraftingBookInfo(category, group),
+                ItemStackTemplate.fromNonEmptyStack(stack), ingredients));
     }
 
     // region Custom

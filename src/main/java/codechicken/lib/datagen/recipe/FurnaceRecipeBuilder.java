@@ -1,5 +1,8 @@
 package codechicken.lib.datagen.recipe;
 
+import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -65,7 +68,7 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder smelting(HolderGetter<Item> items, ItemStack result, Identifier id) {
-        return new FurnaceRecipeBuilder(id, items, result, SmeltingRecipe::new)
+        return new FurnaceRecipeBuilder(id, items, result, cooking(SmeltingRecipe::new))
                 .cookingTime(200);
     }
     //endregion
@@ -100,7 +103,7 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder blasting(HolderGetter<Item> items, ItemStack result, Identifier id) {
-        return new FurnaceRecipeBuilder(id, items, result, BlastingRecipe::new)
+        return new FurnaceRecipeBuilder(id, items, result, cooking(BlastingRecipe::new))
                 .cookingTime(100);
     }
     //endregion
@@ -135,7 +138,7 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder smoking(HolderGetter<Item> items, ItemStack result, Identifier id) {
-        return new FurnaceRecipeBuilder(id, items, result, SmokingRecipe::new)
+        return new FurnaceRecipeBuilder(id, items, result, cooking(SmokingRecipe::new))
                 .cookingTime(100);
     }
     //endregion
@@ -170,7 +173,7 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder campfire(HolderGetter<Item> items, ItemStack result, Identifier id) {
-        return new FurnaceRecipeBuilder(id, items, result, CampfireCookingRecipe::new)
+        return new FurnaceRecipeBuilder(id, items, result, cooking(CampfireCookingRecipe::new))
                 .cookingTime(600);
     }
     //endregion
@@ -261,6 +264,15 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
         if (ingredient == null) {
             throw new IllegalStateException("No ingredient set.");
         }
+    }
+
+    /**
+     * Adapts a vanilla 26.3 cooking recipe constructor to {@link Factory}.
+     */
+    public static Factory cooking(AbstractCookingRecipe.Factory<?> factory) {
+        return (group, category, ingredient, result, experience, cookingTime) -> factory.create(
+                new Recipe.CommonInfo(true), new AbstractCookingRecipe.CookingBookInfo(category, group),
+                ingredient, ItemStackTemplate.fromNonEmptyStack(result), experience, cookingTime);
     }
 
     public interface Factory {

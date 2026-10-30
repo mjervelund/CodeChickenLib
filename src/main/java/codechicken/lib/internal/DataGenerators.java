@@ -1,5 +1,6 @@
 package codechicken.lib.internal;
 
+import net.minecraft.world.item.DyeColor;
 import codechicken.lib.datagen.LanguageProvider;
 import codechicken.lib.util.CCLTags;
 import net.covers1624.quack.util.CrashLock;
@@ -62,22 +63,22 @@ public class DataGenerators {
                     .addTag(CCLTags.Blocks.WOOLS_GREEN)
                     .addTag(CCLTags.Blocks.WOOLS_RED)
                     .addTag(CCLTags.Blocks.WOOLS_BLACK);
-            tag(CCLTags.Blocks.WOOLS_WHITE).add(Blocks.WHITE_WOOL);
-            tag(CCLTags.Blocks.WOOLS_ORANGE).add(Blocks.ORANGE_WOOL);
-            tag(CCLTags.Blocks.WOOLS_MAGENTA).add(Blocks.MAGENTA_WOOL);
-            tag(CCLTags.Blocks.WOOLS_LIGHT_BLUE).add(Blocks.LIGHT_BLUE_WOOL);
-            tag(CCLTags.Blocks.WOOLS_YELLOW).add(Blocks.YELLOW_WOOL);
-            tag(CCLTags.Blocks.WOOLS_LIME).add(Blocks.LIME_WOOL);
-            tag(CCLTags.Blocks.WOOLS_PINK).add(Blocks.PINK_WOOL);
-            tag(CCLTags.Blocks.WOOLS_GRAY).add(Blocks.GRAY_WOOL);
-            tag(CCLTags.Blocks.WOOLS_LIGHT_GRAY).add(Blocks.LIGHT_GRAY_WOOL);
-            tag(CCLTags.Blocks.WOOLS_CYAN).add(Blocks.CYAN_WOOL);
-            tag(CCLTags.Blocks.WOOLS_PURPLE).add(Blocks.PURPLE_WOOL);
-            tag(CCLTags.Blocks.WOOLS_BLUE).add(Blocks.BLUE_WOOL);
-            tag(CCLTags.Blocks.WOOLS_BROWN).add(Blocks.BROWN_WOOL);
-            tag(CCLTags.Blocks.WOOLS_GREEN).add(Blocks.GREEN_WOOL);
-            tag(CCLTags.Blocks.WOOLS_RED).add(Blocks.RED_WOOL);
-            tag(CCLTags.Blocks.WOOLS_BLACK).add(Blocks.BLACK_WOOL);
+            tag(CCLTags.Blocks.WOOLS_WHITE).add(Blocks.WOOL.pick(DyeColor.WHITE).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_ORANGE).add(Blocks.WOOL.pick(DyeColor.ORANGE).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_MAGENTA).add(Blocks.WOOL.pick(DyeColor.MAGENTA).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_LIGHT_BLUE).add(Blocks.WOOL.pick(DyeColor.LIGHT_BLUE).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_YELLOW).add(Blocks.WOOL.pick(DyeColor.YELLOW).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_LIME).add(Blocks.WOOL.pick(DyeColor.LIME).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_PINK).add(Blocks.WOOL.pick(DyeColor.PINK).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_GRAY).add(Blocks.WOOL.pick(DyeColor.GRAY).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_LIGHT_GRAY).add(Blocks.WOOL.pick(DyeColor.LIGHT_GRAY).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_CYAN).add(Blocks.WOOL.pick(DyeColor.CYAN).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_PURPLE).add(Blocks.WOOL.pick(DyeColor.PURPLE).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_BLUE).add(Blocks.WOOL.pick(DyeColor.BLUE).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_BROWN).add(Blocks.WOOL.pick(DyeColor.BROWN).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_GREEN).add(Blocks.WOOL.pick(DyeColor.GREEN).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_RED).add(Blocks.WOOL.pick(DyeColor.RED).builtInRegistryHolder().key());
+            tag(CCLTags.Blocks.WOOLS_BLACK).add(Blocks.WOOL.pick(DyeColor.BLACK).builtInRegistryHolder().key());
         }
 
         @Override
@@ -111,22 +112,22 @@ public class DataGenerators {
                     .addTag(CCLTags.Items.WOOLS_GREEN)
                     .addTag(CCLTags.Items.WOOLS_RED)
                     .addTag(CCLTags.Items.WOOLS_BLACK);
-            tag(CCLTags.Items.WOOLS_WHITE).add(Items.WHITE_WOOL);
-            tag(CCLTags.Items.WOOLS_ORANGE).add(Items.ORANGE_WOOL);
-            tag(CCLTags.Items.WOOLS_MAGENTA).add(Items.MAGENTA_WOOL);
-            tag(CCLTags.Items.WOOLS_LIGHT_BLUE).add(Items.LIGHT_BLUE_WOOL);
-            tag(CCLTags.Items.WOOLS_YELLOW).add(Items.YELLOW_WOOL);
-            tag(CCLTags.Items.WOOLS_LIME).add(Items.LIME_WOOL);
-            tag(CCLTags.Items.WOOLS_PINK).add(Items.PINK_WOOL);
-            tag(CCLTags.Items.WOOLS_GRAY).add(Items.GRAY_WOOL);
-            tag(CCLTags.Items.WOOLS_LIGHT_GRAY).add(Items.LIGHT_GRAY_WOOL);
-            tag(CCLTags.Items.WOOLS_CYAN).add(Items.CYAN_WOOL);
-            tag(CCLTags.Items.WOOLS_PURPLE).add(Items.PURPLE_WOOL);
-            tag(CCLTags.Items.WOOLS_BLUE).add(Items.BLUE_WOOL);
-            tag(CCLTags.Items.WOOLS_BROWN).add(Items.BROWN_WOOL);
-            tag(CCLTags.Items.WOOLS_GREEN).add(Items.GREEN_WOOL);
-            tag(CCLTags.Items.WOOLS_RED).add(Items.RED_WOOL);
-            tag(CCLTags.Items.WOOLS_BLACK).add(Items.BLACK_WOOL);
+            tag(CCLTags.Items.WOOLS_WHITE).add(Items.WOOL.pick(DyeColor.WHITE).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_ORANGE).add(Items.WOOL.pick(DyeColor.ORANGE).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_MAGENTA).add(Items.WOOL.pick(DyeColor.MAGENTA).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_LIGHT_BLUE).add(Items.WOOL.pick(DyeColor.LIGHT_BLUE).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_YELLOW).add(Items.WOOL.pick(DyeColor.YELLOW).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_LIME).add(Items.WOOL.pick(DyeColor.LIME).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_PINK).add(Items.WOOL.pick(DyeColor.PINK).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_GRAY).add(Items.WOOL.pick(DyeColor.GRAY).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_LIGHT_GRAY).add(Items.WOOL.pick(DyeColor.LIGHT_GRAY).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_CYAN).add(Items.WOOL.pick(DyeColor.CYAN).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_PURPLE).add(Items.WOOL.pick(DyeColor.PURPLE).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_BLUE).add(Items.WOOL.pick(DyeColor.BLUE).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_BROWN).add(Items.WOOL.pick(DyeColor.BROWN).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_GREEN).add(Items.WOOL.pick(DyeColor.GREEN).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_RED).add(Items.WOOL.pick(DyeColor.RED).builtInRegistryHolder().key());
+            tag(CCLTags.Items.WOOLS_BLACK).add(Items.WOOL.pick(DyeColor.BLACK).builtInRegistryHolder().key());
         }
 
         @Override
