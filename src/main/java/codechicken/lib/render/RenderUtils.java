@@ -3,7 +3,7 @@ package codechicken.lib.render;
 import codechicken.lib.render.buffer.TransformingVertexConsumer;
 import codechicken.lib.vec.*;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;

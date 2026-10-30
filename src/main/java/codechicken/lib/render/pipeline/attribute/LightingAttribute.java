@@ -3,7 +3,7 @@ package codechicken.lib.render.pipeline.attribute;
 import codechicken.lib.colour.ColourRGBA;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.VertexAttribute;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
+import com.mojang.renderpearl.api.vertex.VertexFormatElement;
 import org.jetbrains.annotations.Nullable;
 
 /**

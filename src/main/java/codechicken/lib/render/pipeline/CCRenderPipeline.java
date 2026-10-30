@@ -1,7 +1,7 @@
 package codechicken.lib.render.pipeline;
 
 import codechicken.lib.render.CCRenderState;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
+import com.mojang.renderpearl.api.vertex.VertexFormatElement;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;

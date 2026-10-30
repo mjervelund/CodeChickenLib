@@ -13,7 +13,7 @@ import codechicken.lib.vec.*;
 import codechicken.lib.vec.uv.UV;
 import codechicken.lib.vec.uv.UVTransformation;
 import codechicken.lib.vec.uv.UVTranslation;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;

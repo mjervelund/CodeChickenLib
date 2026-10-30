@@ -5,7 +5,7 @@ import codechicken.lib.util.ResourceUtils;
 import codechicken.lib.vec.SwapYZ;
 import codechicken.lib.vec.Transformation;
 import codechicken.lib.vec.Vector3;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceProvider;

@@ -2,7 +2,7 @@ package codechicken.lib.render.model;
 
 import codechicken.lib.render.CCModel;
 import codechicken.lib.test.TestResourceProvider;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
 import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 
