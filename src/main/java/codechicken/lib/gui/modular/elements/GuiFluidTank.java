@@ -7,7 +7,7 @@
 //import codechicken.lib.gui.modular.sprite.SpriteSupplier;
 //import codechicken.lib.util.FormatUtil;
 //import net.minecraft.client.Minecraft;
-//import net.minecraft.client.gui.GuiGraphics;
+//import net.minecraft.client.gui.GuiGraphicsExtractor;
 //import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 //import net.minecraft.network.chat.Component;
 //import net.minecraft.network.chat.Style;
@@ -137,7 +137,7 @@
 //    }
 //
 //    @Override
-//    public void renderBehind(GuiGraphics graphics, double mouseX, double mouseY, float partialTicks) {
+//    public void renderBehind(GuiGraphicsExtractor graphics, double mouseX, double mouseY, float partialTicks) {
 //        FluidStack stack = getFluidStack();
 //        var fluidStill = getStillTexture(stack);
 //

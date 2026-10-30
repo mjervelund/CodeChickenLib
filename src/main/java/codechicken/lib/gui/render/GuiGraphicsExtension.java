@@ -5,7 +5,7 @@ import codechicken.lib.gui.modular.lib.geometry.Borders;
 import codechicken.lib.gui.modular.lib.geometry.Rectangle;
 import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.state.gui.BlitRenderState;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -24,13 +24,13 @@ import org.jetbrains.annotations.Nullable;
 /**
  * An extension interface providing many various GUI rendering helpers.
  *
- * @see GuiGraphics
+ * @see GuiGraphicsExtractor
  */
 // TODO document all these, they mostly came from the old GuiRender class from ModularGui, and all had documentation.
 public interface GuiGraphicsExtension {
 
-    private GuiGraphics self() {
-        return (GuiGraphics) this;
+    private GuiGraphicsExtractor self() {
+        return (GuiGraphicsExtractor) this;
     }
 
     default void cc$fillGradientH(Rectangle rect, int col1, int col2) {

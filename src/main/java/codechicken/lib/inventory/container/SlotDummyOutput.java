@@ -1,7 +1,7 @@
 //package codechicken.lib.inventory.container;
 //
 //import net.minecraft.entity.player.EntityPlayer;
-//import net.minecraft.inventory.ClickType;
+//import net.minecraft.inventory.ContainerInput;
 //import net.minecraft.inventory.IInventory;
 //import net.minecraft.item.ItemStack;
 //
@@ -12,7 +12,7 @@
 //    }
 //
 //    @Override
-//    public ItemStack slotClick(ContainerExtended container, EntityPlayer player, int button, ClickType clickType) {
+//    public ItemStack slotClick(ContainerExtended container, EntityPlayer player, int button, ContainerInput clickType) {
 //        return ItemStack.EMPTY;
 //    }
 //}

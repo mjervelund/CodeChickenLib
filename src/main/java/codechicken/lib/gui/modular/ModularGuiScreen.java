@@ -2,7 +2,7 @@ package codechicken.lib.gui.modular;
 
 import codechicken.lib.gui.modular.lib.GuiProvider;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -63,9 +63,9 @@ public class ModularGuiScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
         if (modularGui.renderBackground()) {
-            renderBackground(graphics, mouseX, mouseY, partialTicks);
+            extractBackground(graphics, mouseX, mouseY, partialTicks);
         }
         modularGui.render(graphics, partialTicks);
         // TODO do we render atop JEI? Whats the event ordering here?

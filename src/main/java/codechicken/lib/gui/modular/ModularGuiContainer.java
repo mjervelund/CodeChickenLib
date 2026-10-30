@@ -7,7 +7,7 @@ import codechicken.lib.gui.modular.lib.geometry.GeoParam;
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
@@ -17,7 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -77,80 +77,59 @@ public class ModularGuiContainer<T extends AbstractContainerMenu> extends Abstra
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
         GuiElement<?> root = modularGui.getRoot();
         topPos = (int) root.getValue(GeoParam.TOP);
         leftPos = (int) root.getValue(GeoParam.LEFT);
         imageWidth = (int) root.getValue(GeoParam.WIDTH);
         imageHeight = (int) root.getValue(GeoParam.HEIGHT);
 
-        super.render(graphics, mouseX, mouseY, partialTicks);
+        super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
 
         if (!handleFloatingItemRender(graphics, mouseX, mouseY) && !renderHoveredStackToolTip(graphics, mouseX, mouseY)) {
             modularGui.renderOverlay(graphics, partialTicks);
         }
     }
 
-    private void renderModularGui(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    private void renderModularGui(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
         modularGui.render(graphics, partialTicks);
     }
 
     @Override
-    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         if (modularGui.renderBackground()) {
-            super.renderBackground(graphics, mouseX, mouseY, partialTick);
+            super.extractBackground(graphics, mouseX, mouseY, partialTick);
         }
     }
 
     @Override
-    public void renderCarriedItem(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    public void extractCarriedItem(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
         if (modularGui.vanillaSlotRendering()) return;
-        super.renderCarriedItem(guiGraphics, mouseX, mouseY);
+        super.extractCarriedItem(guiGraphics, mouseX, mouseY);
     }
 
-    @Override
-    public void renderSnapbackItem(GuiGraphics guiGraphics) {
-        if (modularGui.vanillaSlotRendering()) return;
-        super.renderSnapbackItem(guiGraphics);
-    }
-
-    protected boolean handleFloatingItemRender(GuiGraphics graphics, int mouseX, int mouseY) {
+    // 26.3 dropped the touchscreen drag (split stack) and snapback animations from AbstractContainerScreen.
+    protected boolean handleFloatingItemRender(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (modularGui.vanillaSlotRendering()) return false;
         boolean ret = false;
 
-        ItemStack stack = draggingItem.isEmpty() ? menu.getCarried() : draggingItem;
+        ItemStack stack = menu.getCarried();
         if (!stack.isEmpty()) {
-            int yOffset = draggingItem.isEmpty() ? 8 : 16;
             String countOverride = null;
-            if (!draggingItem.isEmpty() && isSplittingStack) {
-                stack = stack.copyWithCount(Mth.ceil((float) stack.getCount() / 2.0F));
-            } else if (isQuickCrafting && quickCraftSlots.size() > 1) {
+            if (isQuickCrafting && quickCraftSlots.size() > 1) {
                 stack = stack.copyWithCount(this.quickCraftingRemainder);
                 if (stack.isEmpty()) {
                     countOverride = ChatFormatting.YELLOW + "0";
                 }
             }
-            renderFloatingItem(graphics, stack, mouseX - 8, mouseY - yOffset, countOverride);
-            ret = modularGui.doesFloatingItemDisableToolTips();
-        }
-
-        if (snapbackData != null) {
-            float anim = Mth.clamp((float) (Util.getMillis() - snapbackData.time()) / 100.0F, 0F, 1F);
-            int xDist = snapbackData.end().x - snapbackData.start().x;
-            int yDist = snapbackData.end().y - snapbackData.start().y;
-            int xPos = snapbackData.start().x + (int) ((float) xDist * anim);
-            int yPos = snapbackData.start().y + (int) ((float) yDist * anim);
-            renderFloatingItem(graphics, snapbackData.item(), xPos + leftPos, yPos + topPos, null);
-            if (anim >= 1.0F) {
-                this.snapbackData = null;
-            }
+            extractFloatingItem(graphics, stack, mouseX - 8, mouseY - 8, countOverride);
             ret = modularGui.doesFloatingItemDisableToolTips();
         }
 
         return ret;
     }
 
-    protected boolean renderHoveredStackToolTip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+    protected boolean renderHoveredStackToolTip(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY) {
         if (this.menu.getCarried().isEmpty() && this.hoveredSlot != null && this.hoveredSlot.hasItem() && showTooltipWithItemInHand(hoveredSlot.getItem())) {
             GuiElement<?> handler = modularGui.getSlotHandler(hoveredSlot);
             if (handler != null && (handler.blockMouseOver(handler, mouseX, mouseY) || !handler.isMouseOver())) {
@@ -222,13 +201,9 @@ public class ModularGuiContainer<T extends AbstractContainerMenu> extends Abstra
     //=== AbstractContainerMenu Overrides ===//
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-    }
-
-    @Override
-    protected void renderSlot(GuiGraphics guiGraphics, Slot slot, int mouseX, int mouseY) {
+    protected void extractSlot(GuiGraphicsExtractor guiGraphics, Slot slot, int mouseX, int mouseY) {
         if (modularGui.vanillaSlotRendering()) {
-            super.renderSlot(guiGraphics, slot, mouseX, mouseY);
+            super.extractSlot(guiGraphics, slot, mouseX, mouseY);
         } else {
             renderingSlots = true;
         }
@@ -236,19 +211,16 @@ public class ModularGuiContainer<T extends AbstractContainerMenu> extends Abstra
 
     //Modular gui friendly version of the slot render
     @Override
-    public void doRenderSlot(GuiGraphics graphics, Slot slot) {
+    public void doRenderSlot(GuiGraphicsExtractor graphics, Slot slot) {
         if (modularGui.vanillaSlotRendering()) return;
         int slotX = slot.x + leftPos;
         int slotY = slot.y + topPos;
         ItemStack slotStack = slot.getItem();
         boolean dragingToSlot = false;
-        boolean dontRenderItem = slot == this.clickedSlot && !this.draggingItem.isEmpty() && !this.isSplittingStack;
 
         ItemStack carriedStack = this.menu.getCarried();
         String countString = null;
-        if (slot == this.clickedSlot && !this.draggingItem.isEmpty() && this.isSplittingStack && !slotStack.isEmpty()) {
-            slotStack = slotStack.copyWithCount(slotStack.getCount() / 2);
-        } else if (this.isQuickCrafting && this.quickCraftSlots.contains(slot) && !carriedStack.isEmpty()) {
+        if (this.isQuickCrafting && this.quickCraftSlots.contains(slot) && !carriedStack.isEmpty()) {
             if (this.quickCraftSlots.size() == 1) {
                 return;
             }
@@ -257,7 +229,7 @@ public class ModularGuiContainer<T extends AbstractContainerMenu> extends Abstra
                 dragingToSlot = true;
                 int k = Math.min(carriedStack.getMaxStackSize(), slot.getMaxStackSize(carriedStack));
                 int l = slot.getItem().isEmpty() ? 0 : slot.getItem().getCount();
-                int m = AbstractContainerMenu.getQuickCraftPlaceCount(this.quickCraftSlots, this.quickCraftingType, carriedStack) + l;
+                int m = AbstractContainerMenu.getQuickCraftPlaceCount(this.quickCraftSlots.size(), this.quickCraftingType, carriedStack) + l;
                 if (m > k) {
                     m = k;
                     countString = ChatFormatting.YELLOW.toString() + k;
@@ -270,13 +242,11 @@ public class ModularGuiContainer<T extends AbstractContainerMenu> extends Abstra
             }
         }
 
-        if (!dontRenderItem) {
-            if (dragingToSlot) {
-                //Highlights slots when doing a drag place operation.
-                graphics.fill(slotX, slotY, slotX + 16, slotY + 16, 0x80ffffff);
-            }
-            renderSlotContents(graphics, slotStack, slot, countString);
+        if (dragingToSlot) {
+            //Highlights slots when doing a drag place operation.
+            graphics.fill(slotX, slotY, slotX + 16, slotY + 16, 0x80ffffff);
         }
+        renderSlotContents(graphics, slotStack, slot, countString);
     }
 
     @Override
@@ -292,7 +262,7 @@ public class ModularGuiContainer<T extends AbstractContainerMenu> extends Abstra
     }
 
     @Override //Disable vanilla title and inventory name rendering
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+    protected void extractLabels(GuiGraphicsExtractor guiGraphics, int i, int j) {
         renderingSlots = false;
     }
 
@@ -310,7 +280,7 @@ public class ModularGuiContainer<T extends AbstractContainerMenu> extends Abstra
     }
 
     @Override
-    protected void slotClicked(Slot slot, int i, int j, ClickType clickType) {
+    protected void slotClicked(Slot slot, int i, int j, ContainerInput clickType) {
         if (slot != null) {
             GuiElement<?> handler = modularGui.getSlotHandler(slot);
             if (handler != null && !handler.isEnabled()) return;

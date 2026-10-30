@@ -11,7 +11,7 @@ import net.covers1624.quack.image.AnimatedGifEncoder;
 import net.covers1624.quack.io.IOUtils;
 import net.covers1624.quack.platform.OperatingSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -109,7 +109,7 @@ public class ItemFileRenderer {
 //            long start = System.nanoTime();
 //            Minecraft mc = Minecraft.getInstance();
 //            Matrix4fStack pStack = RenderSystem.getModelViewStack();
-//            GuiGraphics guiGraphics = new GuiGraphics(mc, mc.renderBuffers().bufferSource());
+//            GuiGraphicsExtractor guiGraphics = new GuiGraphicsExtractor(mc, mc.renderBuffers().bufferSource());
 //
 //            if (target == null || target.width < resolution || target.height < resolution) {
 //                if (target == null) {

@@ -7,7 +7,7 @@
 //import codechicken.lib.gui.modular.sprite.SpriteSupplier;
 //import codechicken.lib.util.FormatUtil;
 //import net.minecraft.client.Minecraft;
-//import net.minecraft.client.gui.GuiGraphics;
+//import net.minecraft.client.gui.GuiGraphicsExtractor;
 //import net.minecraft.network.chat.Component;
 //
 //import java.text.DecimalFormat;
@@ -131,7 +131,7 @@
 //    }
 //
 //    @Override
-//    public void renderBehind(GuiGraphics graphics, double mouseX, double mouseY, float partialTicks) {
+//    public void renderBehind(GuiGraphicsExtractor graphics, double mouseX, double mouseY, float partialTicks) {
 //        float p = 1 / 128F;
 //        float height = getCapacity() <= 0 ? 0 : (float) ySize() * (getEnergy() / (float) getCapacity());
 //        float texHeight = height * p;
