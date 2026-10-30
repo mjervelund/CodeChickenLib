@@ -12,7 +12,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import org.apache.logging.log4j.LogManager;
@@ -36,7 +35,7 @@ public class ShapedRecipeBuilder extends AbstractItemStackRecipeBuilder<ShapedRe
     private CraftingBookCategory category = CraftingBookCategory.MISC;
     private boolean showNotification = true;
 
-    protected ShapedRecipeBuilder(Identifier id, HolderGetter<Item> items, ItemStack result, Factory factory) {
+    protected ShapedRecipeBuilder(Identifier id, HolderGetter<Item> items, ItemStackTemplate result, Factory factory) {
         super(id, items, result);
         this.factory = factory;
     }
@@ -46,11 +45,11 @@ public class ShapedRecipeBuilder extends AbstractItemStackRecipeBuilder<ShapedRe
     }
 
     public static ShapedRecipeBuilder builder(HolderGetter<Item> items, ItemLike result, int count) {
-        return builder(items, new ItemStack(result, count));
+        return builder(items, new ItemStackTemplate(result.asItem(), count));
     }
 
     public static ShapedRecipeBuilder builder(HolderGetter<Item> items, ItemLike result, int count, Identifier id) {
-        return builder(items, new ItemStack(result, count), id);
+        return builder(items, new ItemStackTemplate(result.asItem(), count), id);
     }
 
     public static ShapedRecipeBuilder builder(HolderGetter<Item> items, Supplier<? extends ItemLike> result) {
@@ -58,21 +57,21 @@ public class ShapedRecipeBuilder extends AbstractItemStackRecipeBuilder<ShapedRe
     }
 
     public static ShapedRecipeBuilder builder(HolderGetter<Item> items, Supplier<? extends ItemLike> result, int count) {
-        return builder(items, new ItemStack(result.get(), count));
+        return builder(items, new ItemStackTemplate(result.get().asItem(), count));
     }
 
     public static ShapedRecipeBuilder builder(HolderGetter<Item> items, Supplier<? extends ItemLike> result, int count, Identifier id) {
-        return builder(items, new ItemStack(result.get(), count), id);
+        return builder(items, new ItemStackTemplate(result.get().asItem(), count), id);
     }
 
-    public static ShapedRecipeBuilder builder(HolderGetter<Item> items, ItemStack result) {
-        return builder(items, result, BuiltInRegistries.ITEM.getKey(result.getItem()));
+    public static ShapedRecipeBuilder builder(HolderGetter<Item> items, ItemStackTemplate result) {
+        return builder(items, result, BuiltInRegistries.ITEM.getKey(result.item().value()));
     }
 
-    public static ShapedRecipeBuilder builder(HolderGetter<Item> items, ItemStack result, Identifier id) {
+    public static ShapedRecipeBuilder builder(HolderGetter<Item> items, ItemStackTemplate result, Identifier id) {
         return new ShapedRecipeBuilder(id, items, result, (group, category, pattern, stack, showNotification) -> new ShapedRecipe(
                 new Recipe.CommonInfo(showNotification), new CraftingRecipe.CraftingBookInfo(category, group),
-                pattern, ItemStackTemplate.fromNonEmptyStack(stack)));
+                pattern, stack));
     }
 
     // region Custom
@@ -81,18 +80,18 @@ public class ShapedRecipeBuilder extends AbstractItemStackRecipeBuilder<ShapedRe
     }
 
     public static ShapedRecipeBuilder custom(HolderGetter<Item> items, ItemLike result, int count, Factory factory) {
-        return custom(items, new ItemStack(result, count), factory);
+        return custom(items, new ItemStackTemplate(result.asItem(), count), factory);
     }
 
     public static ShapedRecipeBuilder custom(HolderGetter<Item> items, ItemLike result, int count, Identifier id, Factory factory) {
-        return custom(items, new ItemStack(result, count), id, factory);
+        return custom(items, new ItemStackTemplate(result.asItem(), count), id, factory);
     }
 
-    public static ShapedRecipeBuilder custom(HolderGetter<Item> items, ItemStack result, Factory factory) {
-        return custom(items, result, BuiltInRegistries.ITEM.getKey(result.getItem()), factory);
+    public static ShapedRecipeBuilder custom(HolderGetter<Item> items, ItemStackTemplate result, Factory factory) {
+        return custom(items, result, BuiltInRegistries.ITEM.getKey(result.item().value()), factory);
     }
 
-    public static ShapedRecipeBuilder custom(HolderGetter<Item> items, ItemStack result, Identifier id, Factory factory) {
+    public static ShapedRecipeBuilder custom(HolderGetter<Item> items, ItemStackTemplate result, Identifier id, Factory factory) {
         return new ShapedRecipeBuilder(id, items, result, factory);
     }
     // endregion
@@ -189,6 +188,6 @@ public class ShapedRecipeBuilder extends AbstractItemStackRecipeBuilder<ShapedRe
 
     public interface Factory {
 
-        Recipe<?> build(String group, CraftingBookCategory category, ShapedRecipePattern pattern, ItemStack result, boolean showNotification);
+        Recipe<?> build(String group, CraftingBookCategory category, ShapedRecipePattern pattern, ItemStackTemplate result, boolean showNotification);
     }
 }

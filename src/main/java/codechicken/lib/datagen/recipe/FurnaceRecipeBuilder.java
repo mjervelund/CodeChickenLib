@@ -8,7 +8,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import org.apache.logging.log4j.LogManager;
@@ -33,7 +32,7 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     private float experience = 0.0F;
     private int cookingTime = 200;
 
-    protected FurnaceRecipeBuilder(Identifier id, HolderGetter<Item> items, ItemStack result, Factory factory) {
+    protected FurnaceRecipeBuilder(Identifier id, HolderGetter<Item> items, ItemStackTemplate result, Factory factory) {
         super(id, items, result);
         this.factory = factory;
     }
@@ -44,11 +43,11 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder smelting(HolderGetter<Item> items, ItemLike result, int count) {
-        return smelting(items, new ItemStack(result, count));
+        return smelting(items, new ItemStackTemplate(result.asItem(), count));
     }
 
     public static FurnaceRecipeBuilder smelting(HolderGetter<Item> items, ItemLike result, int count, Identifier id) {
-        return smelting(items, new ItemStack(result, count), id);
+        return smelting(items, new ItemStackTemplate(result.asItem(), count), id);
     }
 
     public static FurnaceRecipeBuilder smelting(HolderGetter<Item> items, Supplier<? extends ItemLike> result) {
@@ -56,18 +55,18 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder smelting(HolderGetter<Item> items, Supplier<? extends ItemLike> result, int count) {
-        return smelting(items, new ItemStack(result.get(), count));
+        return smelting(items, new ItemStackTemplate(result.get().asItem(), count));
     }
 
     public static FurnaceRecipeBuilder smelting(HolderGetter<Item> items, Supplier<? extends ItemLike> result, int count, Identifier id) {
-        return smelting(items, new ItemStack(result.get(), count), id);
+        return smelting(items, new ItemStackTemplate(result.get().asItem(), count), id);
     }
 
-    public static FurnaceRecipeBuilder smelting(HolderGetter<Item> items, ItemStack result) {
-        return smelting(items, result, BuiltInRegistries.ITEM.getKey(result.getItem()));
+    public static FurnaceRecipeBuilder smelting(HolderGetter<Item> items, ItemStackTemplate result) {
+        return smelting(items, result, BuiltInRegistries.ITEM.getKey(result.item().value()));
     }
 
-    public static FurnaceRecipeBuilder smelting(HolderGetter<Item> items, ItemStack result, Identifier id) {
+    public static FurnaceRecipeBuilder smelting(HolderGetter<Item> items, ItemStackTemplate result, Identifier id) {
         return new FurnaceRecipeBuilder(id, items, result, cooking(SmeltingRecipe::new))
                 .cookingTime(200);
     }
@@ -79,11 +78,11 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder blasting(HolderGetter<Item> items, ItemLike result, int count) {
-        return blasting(items, new ItemStack(result, count));
+        return blasting(items, new ItemStackTemplate(result.asItem(), count));
     }
 
     public static FurnaceRecipeBuilder blasting(HolderGetter<Item> items, ItemLike result, int count, Identifier id) {
-        return blasting(items, new ItemStack(result, count), id);
+        return blasting(items, new ItemStackTemplate(result.asItem(), count), id);
     }
 
     public static FurnaceRecipeBuilder blasting(HolderGetter<Item> items, Supplier<? extends ItemLike> result) {
@@ -91,18 +90,18 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder blasting(HolderGetter<Item> items, Supplier<? extends ItemLike> result, int count) {
-        return blasting(items, new ItemStack(result.get(), count));
+        return blasting(items, new ItemStackTemplate(result.get().asItem(), count));
     }
 
     public static FurnaceRecipeBuilder blasting(HolderGetter<Item> items, Supplier<? extends ItemLike> result, int count, Identifier id) {
-        return blasting(items, new ItemStack(result.get(), count), id);
+        return blasting(items, new ItemStackTemplate(result.get().asItem(), count), id);
     }
 
-    public static FurnaceRecipeBuilder blasting(HolderGetter<Item> items, ItemStack result) {
-        return blasting(items, result, BuiltInRegistries.ITEM.getKey(result.getItem()));
+    public static FurnaceRecipeBuilder blasting(HolderGetter<Item> items, ItemStackTemplate result) {
+        return blasting(items, result, BuiltInRegistries.ITEM.getKey(result.item().value()));
     }
 
-    public static FurnaceRecipeBuilder blasting(HolderGetter<Item> items, ItemStack result, Identifier id) {
+    public static FurnaceRecipeBuilder blasting(HolderGetter<Item> items, ItemStackTemplate result, Identifier id) {
         return new FurnaceRecipeBuilder(id, items, result, cooking(BlastingRecipe::new))
                 .cookingTime(100);
     }
@@ -114,11 +113,11 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder smoking(HolderGetter<Item> items, ItemLike result, int count) {
-        return smoking(items, new ItemStack(result, count));
+        return smoking(items, new ItemStackTemplate(result.asItem(), count));
     }
 
     public static FurnaceRecipeBuilder smoking(HolderGetter<Item> items, ItemLike result, int count, Identifier id) {
-        return smoking(items, new ItemStack(result, count), id);
+        return smoking(items, new ItemStackTemplate(result.asItem(), count), id);
     }
 
     public static FurnaceRecipeBuilder smoking(HolderGetter<Item> items, Supplier<? extends ItemLike> result) {
@@ -126,18 +125,18 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder smoking(HolderGetter<Item> items, Supplier<? extends ItemLike> result, int count) {
-        return smoking(items, new ItemStack(result.get(), count));
+        return smoking(items, new ItemStackTemplate(result.get().asItem(), count));
     }
 
     public static FurnaceRecipeBuilder smoking(HolderGetter<Item> items, Supplier<? extends ItemLike> result, int count, Identifier id) {
-        return smoking(items, new ItemStack(result.get(), count), id);
+        return smoking(items, new ItemStackTemplate(result.get().asItem(), count), id);
     }
 
-    public static FurnaceRecipeBuilder smoking(HolderGetter<Item> items, ItemStack result) {
-        return smoking(items, result, BuiltInRegistries.ITEM.getKey(result.getItem()));
+    public static FurnaceRecipeBuilder smoking(HolderGetter<Item> items, ItemStackTemplate result) {
+        return smoking(items, result, BuiltInRegistries.ITEM.getKey(result.item().value()));
     }
 
-    public static FurnaceRecipeBuilder smoking(HolderGetter<Item> items, ItemStack result, Identifier id) {
+    public static FurnaceRecipeBuilder smoking(HolderGetter<Item> items, ItemStackTemplate result, Identifier id) {
         return new FurnaceRecipeBuilder(id, items, result, cooking(SmokingRecipe::new))
                 .cookingTime(100);
     }
@@ -149,11 +148,11 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder campfire(HolderGetter<Item> items, ItemLike result, int count) {
-        return campfire(items, new ItemStack(result, count));
+        return campfire(items, new ItemStackTemplate(result.asItem(), count));
     }
 
     public static FurnaceRecipeBuilder campfire(HolderGetter<Item> items, ItemLike result, int count, Identifier id) {
-        return campfire(items, new ItemStack(result, count), id);
+        return campfire(items, new ItemStackTemplate(result.asItem(), count), id);
     }
 
     public static FurnaceRecipeBuilder campfire(HolderGetter<Item> items, Supplier<? extends ItemLike> result) {
@@ -161,18 +160,18 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder campfire(HolderGetter<Item> items, Supplier<? extends ItemLike> result, int count) {
-        return campfire(items, new ItemStack(result.get(), count));
+        return campfire(items, new ItemStackTemplate(result.get().asItem(), count));
     }
 
     public static FurnaceRecipeBuilder campfire(HolderGetter<Item> items, Supplier<? extends ItemLike> result, int count, Identifier id) {
-        return campfire(items, new ItemStack(result.get(), count), id);
+        return campfire(items, new ItemStackTemplate(result.get().asItem(), count), id);
     }
 
-    public static FurnaceRecipeBuilder campfire(HolderGetter<Item> items, ItemStack result) {
-        return campfire(items, result, BuiltInRegistries.ITEM.getKey(result.getItem()));
+    public static FurnaceRecipeBuilder campfire(HolderGetter<Item> items, ItemStackTemplate result) {
+        return campfire(items, result, BuiltInRegistries.ITEM.getKey(result.item().value()));
     }
 
-    public static FurnaceRecipeBuilder campfire(HolderGetter<Item> items, ItemStack result, Identifier id) {
+    public static FurnaceRecipeBuilder campfire(HolderGetter<Item> items, ItemStackTemplate result, Identifier id) {
         return new FurnaceRecipeBuilder(id, items, result, cooking(CampfireCookingRecipe::new))
                 .cookingTime(600);
     }
@@ -184,11 +183,11 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder custom(HolderGetter<Item> items, ItemLike result, int count, Factory factory) {
-        return custom(items, new ItemStack(result, count), factory);
+        return custom(items, new ItemStackTemplate(result.asItem(), count), factory);
     }
 
     public static FurnaceRecipeBuilder custom(HolderGetter<Item> items, ItemLike result, int count, Identifier id, Factory factory) {
-        return custom(items, new ItemStack(result, count), id, factory);
+        return custom(items, new ItemStackTemplate(result.asItem(), count), id, factory);
     }
 
     public static FurnaceRecipeBuilder custom(HolderGetter<Item> items, Supplier<? extends ItemLike> result, Factory factory) {
@@ -196,18 +195,18 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     }
 
     public static FurnaceRecipeBuilder custom(HolderGetter<Item> items, Supplier<? extends ItemLike> result, int count, Factory factory) {
-        return custom(items, new ItemStack(result.get(), count), factory);
+        return custom(items, new ItemStackTemplate(result.get().asItem(), count), factory);
     }
 
     public static FurnaceRecipeBuilder custom(HolderGetter<Item> items, Supplier<? extends ItemLike> result, int count, Identifier id, Factory factory) {
-        return custom(items, new ItemStack(result.get(), count), id, factory);
+        return custom(items, new ItemStackTemplate(result.get().asItem(), count), id, factory);
     }
 
-    public static FurnaceRecipeBuilder custom(HolderGetter<Item> items, ItemStack result, Factory factory) {
-        return custom(items, result, BuiltInRegistries.ITEM.getKey(result.getItem()), factory);
+    public static FurnaceRecipeBuilder custom(HolderGetter<Item> items, ItemStackTemplate result, Factory factory) {
+        return custom(items, result, BuiltInRegistries.ITEM.getKey(result.item().value()), factory);
     }
 
-    public static FurnaceRecipeBuilder custom(HolderGetter<Item> items, ItemStack result, Identifier id, Factory factory) {
+    public static FurnaceRecipeBuilder custom(HolderGetter<Item> items, ItemStackTemplate result, Identifier id, Factory factory) {
         return new FurnaceRecipeBuilder(id, items, result, factory);
     }
     //endregion
@@ -272,11 +271,11 @@ public class FurnaceRecipeBuilder extends AbstractItemStackRecipeBuilder<Furnace
     public static Factory cooking(AbstractCookingRecipe.Factory<?> factory) {
         return (group, category, ingredient, result, experience, cookingTime) -> factory.create(
                 new Recipe.CommonInfo(true), new AbstractCookingRecipe.CookingBookInfo(category, group),
-                ingredient, ItemStackTemplate.fromNonEmptyStack(result), experience, cookingTime);
+                ingredient, result, experience, cookingTime);
     }
 
     public interface Factory {
 
-        Recipe<?> build(String group, CookingBookCategory category, Ingredient ingredient, ItemStack result, float experience, int cookingTime);
+        Recipe<?> build(String group, CookingBookCategory category, Ingredient ingredient, ItemStackTemplate result, float experience, int cookingTime);
     }
 }
