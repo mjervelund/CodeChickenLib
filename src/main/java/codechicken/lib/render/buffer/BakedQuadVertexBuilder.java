@@ -104,6 +104,12 @@ public class BakedQuadVertexBuilder implements VertexConsumer, ISpriteAwareVerte
     }
 
     @Override
+    public VertexConsumer setUv3(float u, float v) {
+        // Baked quads dont support a third uv set.
+        return this;
+    }
+
+    @Override
     public VertexConsumer setLineWidth(float lineWidth) {
         // Baked quads dont support line width.
         return this;

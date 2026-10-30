@@ -1,5 +1,6 @@
 package codechicken.lib.internal.command.admin;
 
+import net.minecraft.world.entity.EntityTypes;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -42,7 +43,7 @@ public class KillAllCommand {
                         .requires(Commands.hasPermission(Commands.LEVEL_ADMINS))
                         .then(argument("entity", ResourceArgument.resource(context, Registries.ENTITY_TYPE))
                                 .executes(ctx -> {
-                                    EntityType<?> entityType = ResourceArgument.getEntityType(ctx, "entity").value();
+                                    EntityType<?> entityType = ResourceArgument.getResource(ctx, "entity", Registries.ENTITY_TYPE).value();
                                     return killallForce(ctx, entityType, e -> Objects.equals(e.getType(), entityType));
                                 })
                         )
@@ -50,7 +51,7 @@ public class KillAllCommand {
                         .then(literal("gracefully")
                                 .then(argument("entity", ResourceArgument.resource(context, Registries.ENTITY_TYPE))
                                         .executes(ctx -> {
-                                            EntityType<?> entityType = ResourceArgument.getEntityType(ctx, "entity").value();
+                                            EntityType<?> entityType = ResourceArgument.getResource(ctx, "entity", Registries.ENTITY_TYPE).value();
                                             return killAllGracefully(ctx, entityType, e -> Objects.equals(e.getType(), entityType));
                                         })
                                 )
@@ -69,7 +70,7 @@ public class KillAllCommand {
     }
 
     private static int killEntities(CommandContext<CommandSourceStack> ctx, @Nullable EntityType<?> type, Predicate<Entity> predicate, BiConsumer<ServerLevel, Entity> killFunc) {
-        if (type == EntityType.PLAYER) {
+        if (type == EntityTypes.PLAYER) {
             ctx.getSource().sendSuccess(
                     () -> Component.translatable("ccl.commands.killall.fail.player").withStyle(RED),
                     false);

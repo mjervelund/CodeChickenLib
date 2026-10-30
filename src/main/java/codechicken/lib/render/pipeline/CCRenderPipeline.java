@@ -1,7 +1,6 @@
 package codechicken.lib.render.pipeline;
 
 import codechicken.lib.render.CCRenderState;
-import com.mojang.renderpearl.api.vertex.VertexFormatElement;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -48,10 +47,10 @@ public class CCRenderPipeline {
 
         unbuild();
 
-        if (renderState.fmt.contains(VertexFormatElement.NORMAL)) {
+        if (renderState.fmt.contains("Normal")) {
             addAttribute(renderState.normalAttrib);
         }
-        if (renderState.fmt.contains(VertexFormatElement.COLOR)) {
+        if (renderState.fmt.contains("Color")) {
             addAttribute(renderState.colourAttrib);
         }
         if (renderState.computeLighting) {

@@ -50,6 +50,11 @@ public class ExtentsConsumer implements ISpriteAwareVertexConsumer {
     }
 
     @Override
+    public VertexConsumer setUv3(float u, float v) {
+        return this;
+    }
+
+    @Override
     public VertexConsumer setNormal(float normalX, float normalY, float normalZ) {
         return this;
     }

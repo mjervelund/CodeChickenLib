@@ -1,5 +1,6 @@
 package codechicken.lib.render.lighting;
 
+import net.minecraft.util.LightCoordsUtil;
 import codechicken.lib.render.CCRenderState;
 import codechicken.lib.render.pipeline.IVertexOperation;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -34,7 +35,7 @@ public class PlanarLightMatrix extends PlanarLightModel {
     public int brightness(int side) {
         requireNonNull(access, "PlanarLightMatrix must be located first.");
         if ((sampled & 1 << side) == 0) {
-            brightness[side] = LevelRenderer.getLightColor(access, pos);
+            brightness[side] = LightCoordsUtil.getLightCoords(access, pos);
             sampled |= 1 << side;
         }
         return brightness[side];

@@ -1,5 +1,7 @@
 package codechicken.lib.datagen.recipe;
 
+import net.minecraft.advancements.triggers.CriteriaTriggers;
+import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.advancements.*;
 import net.minecraft.advancements.triggers.InventoryChangeTrigger;
 import net.minecraft.advancements.predicates.ItemPredicate;

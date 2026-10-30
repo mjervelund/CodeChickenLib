@@ -37,7 +37,7 @@ public class CountCommand {
                         .requires(Commands.hasPermission(Commands.LEVEL_ADMINS))
                         .then(argument("entity", ResourceArgument.resource(context, Registries.ENTITY_TYPE))
                                 .executes(ctx -> {
-                                    EntityType<?> entityType = ResourceArgument.getEntityType(ctx, "entity").value();
+                                    EntityType<?> entityType = ResourceArgument.getResource(ctx, "entity", Registries.ENTITY_TYPE).value();
                                     return countAllEntities(ctx, e -> e.equals(entityType));
                                 })
                         )
