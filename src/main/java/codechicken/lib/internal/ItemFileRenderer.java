@@ -24,6 +24,7 @@ import javax.imageio.ImageIO;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -51,6 +52,15 @@ public class ItemFileRenderer {
     private static final LinkedList<RenderTask> tasks = new LinkedList<>();
     private static final Path OUTPUT = Paths.get("exports");
     private static @Nullable RenderTarget target;
+
+    public static boolean isInOutput(String file) {
+        try {
+            Path out = OUTPUT.toAbsolutePath().normalize();
+            return out.resolve(file).normalize().startsWith(out);
+        } catch (InvalidPathException ex) {
+            return false;
+        }
+    }
 
     public static void renderStatic(ItemStack stack, String file, int resolution) {
         tasks.add(new StaticRenderTask(stack, resolution, OUTPUT.resolve(file)));

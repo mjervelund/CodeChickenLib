@@ -105,6 +105,9 @@ public class RenderItemToFileCommand {
         if (str.contains("..")) {
             throw ERROR_INVALID.create(Component.literal("'..' is not allowed in name."));
         }
+        if (!ItemFileRenderer.isInOutput(str)) {
+            throw ERROR_INVALID.create(Component.literal("Name must be a path inside the exports folder."));
+        }
         return str;
     }
 
