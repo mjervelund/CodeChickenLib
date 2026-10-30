@@ -105,6 +105,7 @@ public class MCDataByteBuf implements MCDataInput, MCDataOutput {
     }
 
     //@formatter:off
+    @Override public int readableBytes() { return buf.readableBytes(); }
     @Override public byte readByte() { return buf.readByte(); }
     @Override public short readUByte() { return buf.readUnsignedByte(); }
     @Override public char readChar() { return buf.readChar(); }

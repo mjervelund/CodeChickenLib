@@ -4,6 +4,7 @@ import codechicken.lib.vec.Cuboid6;
 import codechicken.lib.vec.Vector3;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -123,6 +124,29 @@ public interface MCDataInput {
     //region Arrays.
 
     /**
+     * The number of bytes left to read, if known.
+     *
+     * @return The remaining bytes, or {@link Integer#MAX_VALUE} if unknown.
+     */
+    default int readableBytes() {
+        return Integer.MAX_VALUE;
+    }
+
+    /**
+     * Reads an array length, rejecting lengths that can't fit in the remaining data.
+     *
+     * @param minBytesPerElement The smallest encoded size of one element.
+     * @return The length.
+     */
+    default int readLength(int minBytesPerElement) {
+        int len = readVarInt();
+        if (len < 0 || len > readableBytes() / minBytesPerElement) {
+            throw new DecoderException("Array length " + len + " exceeds the " + readableBytes() + " readable bytes");
+        }
+        return len;
+    }
+
+    /**
      * Reads a block of bytes written with,
      * {@link MCDataOutput#writeBytes(byte[])},
      * {@link MCDataOutput#writeBytes(byte[], int, int)}, or
@@ -131,7 +155,7 @@ public interface MCDataInput {
      * @return The bytes.
      */
     default byte[] readBytes() {
-        int len = readVarInt();
+        int len = readLength(1);
         byte[] arr = new byte[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readByte();
@@ -148,7 +172,7 @@ public interface MCDataInput {
      * @return The chars.
      */
     default char[] readChars() {
-        int len = readVarInt();
+        int len = readLength(2);
         char[] arr = new char[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readChar();
@@ -165,7 +189,7 @@ public interface MCDataInput {
      * @return The shorts.
      */
     default short[] readShorts() {
-        int len = readVarInt();
+        int len = readLength(2);
         short[] arr = new short[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readShort();
@@ -182,7 +206,7 @@ public interface MCDataInput {
      * @return The ints.
      */
     default int[] readInts() {
-        int len = readVarInt();
+        int len = readLength(4);
         int[] arr = new int[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readInt();
@@ -199,7 +223,7 @@ public interface MCDataInput {
      * @return The longs.
      */
     default long[] readLongs() {
-        int len = readVarInt();
+        int len = readLength(8);
         long[] arr = new long[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readLong();
@@ -216,7 +240,7 @@ public interface MCDataInput {
      * @return The floats.
      */
     default float[] readFloats() {
-        int len = readVarInt();
+        int len = readLength(4);
         float[] arr = new float[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readFloat();
@@ -233,7 +257,7 @@ public interface MCDataInput {
      * @return The doubles.
      */
     default double[] readDoubles() {
-        int len = readVarInt();
+        int len = readLength(8);
         double[] arr = new double[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readDouble();
@@ -249,7 +273,7 @@ public interface MCDataInput {
      * @return The booleans.
      */
     default boolean[] readBooleans() {
-        int len = readVarInt();
+        int len = readLength(1);
         boolean[] arr = new boolean[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readBoolean();
@@ -338,7 +362,7 @@ public interface MCDataInput {
      * @return The ints.
      */
     default int[] readVarInts() {
-        int len = readVarInt();
+        int len = readLength(1);
         int[] arr = new int[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readVarInt();
@@ -352,7 +376,7 @@ public interface MCDataInput {
      * @return The longs.
      */
     default long[] readVarLongs() {
-        int len = readVarInt();
+        int len = readLength(1);
         long[] arr = new long[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readVarLong();
@@ -366,7 +390,7 @@ public interface MCDataInput {
      * @return The ints.
      */
     default int[] readSignedVarInts() {
-        int len = readVarInt();
+        int len = readLength(1);
         int[] arr = new int[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readSignedVarInt();
@@ -380,7 +404,7 @@ public interface MCDataInput {
      * @return The longs.
      */
     default long[] readSignedVarLongs() {
-        int len = readVarInt();
+        int len = readLength(1);
         long[] arr = new long[len];
         for (int i = 0; i < len; i++) {
             arr[i] = readSignedVarLong();
@@ -416,7 +440,12 @@ public interface MCDataInput {
      * @return The {@link Enum} value.
      */
     default <T extends Enum<T>> T readEnum(Class<T> clazz) {
-        return clazz.getEnumConstants()[readVarInt()];
+        T[] values = clazz.getEnumConstants();
+        int ordinal = readVarInt();
+        if (ordinal < 0 || ordinal >= values.length) {
+            throw new DecoderException("Invalid ordinal " + ordinal + " for " + clazz.getSimpleName());
+        }
+        return values[ordinal];
     }
 
     /**
