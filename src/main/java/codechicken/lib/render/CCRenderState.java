@@ -1,5 +1,7 @@
 package codechicken.lib.render;
 
+import com.mojang.renderpearl.api.vertex.VertexFormatElement;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
 import net.minecraft.util.LightCoordsUtil;
 import codechicken.lib.colour.Colour;
 import codechicken.lib.colour.ColourRGBA;
@@ -19,15 +21,12 @@ import codechicken.lib.vec.Vector3;
 import codechicken.lib.vec.Vertex5;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -149,39 +148,8 @@ public class CCRenderState {
         bind(consumer, renderType.format());
     }
 
-    /**
-     * Bind this {@link CCRenderState} to the given {@link RenderType}.
-     *
-     * @param renderType The {@link RenderType} to bind to.
-     * @param source     The {@link MultiBufferSource} instance.
-     */
-    public void bind(RenderType renderType, MultiBufferSource source) {
-        bind(source.getBuffer(renderType), renderType.format());
-    }
-
-    /**
-     * Bind this {@link CCRenderState} to the given {@link RenderType}, applying
-     * the given MatrixStack.
-     *
-     * @param renderType The {@link RenderType} to bind to.
-     * @param source     The {@link MultiBufferSource} instance.
-     * @param mStack     The {@link PoseStack} to apply.
-     */
-    public void bind(RenderType renderType, MultiBufferSource source, PoseStack mStack) {
-        bind(new TransformingVertexConsumer(source.getBuffer(renderType), mStack), renderType.format());
-    }
-
-    /**
-     * Bind this {@link CCRenderState} to the given {@link RenderType}, applying
-     * the given MatrixStack.
-     *
-     * @param renderType The {@link RenderType} to bind to.
-     * @param getter     The {@link MultiBufferSource} instance.
-     * @param mat        The {@link Matrix4} to apply.
-     */
-    public void bind(RenderType renderType, MultiBufferSource getter, Matrix4 mat) {
-        bind(new TransformingVertexConsumer(getter.getBuffer(renderType), mat), renderType.format());
-    }
+    // MultiBufferSource is gone in 26.3: bind to the VertexConsumer a SubmitNodeCollector hands you,
+    // e.g. through cc$submitCustomGeometry.
 
     /**
      * Resets this {@link CCRenderState} instance's pipeline and internal state.
@@ -259,21 +227,17 @@ public class CCRenderState {
         if (sprite != null && r instanceof ISpriteAwareVertexConsumer cons) {
             cons.sprite(sprite);
         }
+        // Since 26.3 vertex format elements are named attributes rather than usage/index pairs.
         List<VertexFormatElement> elements = fmt.getElements();
         for (VertexFormatElement fmte : elements) {
-            switch (fmte.usage()) {
-                case POSITION -> r.addVertex((float) vert.vec.x, (float) vert.vec.y, (float) vert.vec.z);
-                case UV -> {
-                    switch (fmte.index()) {
-                        case 0 -> r.setUv((float) vert.uv.u, (float) vert.uv.v);
-                        case 1 -> r.setOverlay(overlay);
-                        case 2 -> r.setLight(brightness);
-                        default -> throw new UnsupportedOperationException("Unknown UV index. " + fmte.index());
-                    }
-                }
-                case COLOR -> r.setColor(colour >>> 24, colour >> 16 & 0xFF, colour >> 8 & 0xFF, alphaOverride >= 0 ? alphaOverride : colour & 0xFF);
-                case NORMAL -> r.setNormal((float) normal.x, (float) normal.y, (float) normal.z);
-                default -> throw new UnsupportedOperationException("Generic vertex format element");
+            switch (fmte.name()) {
+                case "Position" -> r.addVertex((float) vert.vec.x, (float) vert.vec.y, (float) vert.vec.z);
+                case "UV0" -> r.setUv((float) vert.uv.u, (float) vert.uv.v);
+                case "UV1" -> r.setOverlay(overlay);
+                case "UV2" -> r.setLight(brightness);
+                case "Color" -> r.setColor(colour >>> 24, colour >> 16 & 0xFF, colour >> 8 & 0xFF, alphaOverride >= 0 ? alphaOverride : colour & 0xFF);
+                case "Normal" -> r.setNormal((float) normal.x, (float) normal.y, (float) normal.z);
+                default -> throw new UnsupportedOperationException("Unsupported vertex format element: " + fmte.name());
             }
         }
     }
@@ -291,7 +255,7 @@ public class CCRenderState {
     }
 
     public void setFluidColour(FluidStack fluidStack, int alpha) {
-        this.baseColour = IClientFluidTypeExtensions.of(fluidStack.getFluid()).getTintColor(fluidStack) << 8 | alpha;
+        this.baseColour = RenderUtils.getFluidTint(fluidStack) << 8 | alpha;
     }
 
     public void setColour(Colour colour) {

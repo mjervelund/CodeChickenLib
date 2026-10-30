@@ -7,15 +7,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.renderpearl.api.vertex.VertexFormat;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.client.ClientHooks;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 
@@ -44,10 +41,27 @@ public class RenderUtils {
         } else {
             bound.max.y = bound.min.y + (bound.max.y - bound.min.y) * capacity;
         }
-        IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(type);
-        TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasManager().get(ClientHooks.getBlockMaterial(props.getStillTexture(stack)));
-        ccrs.baseColour = props.getTintColor(stack) << 8 | alpha;
+        TextureAtlasSprite sprite = getFluidStillSprite(stack);
+        ccrs.baseColour = getFluidTint(stack) << 8 | alpha;
         makeFluidModel(bound, sprite, res).render(ccrs, mat);
+    }
+
+    /**
+     * The still texture of a fluid. Since 26.x fluid textures come from the fluid model, not
+     * {@code IClientFluidTypeExtensions}.
+     */
+    public static TextureAtlasSprite getFluidStillSprite(FluidStack stack) {
+        return Minecraft.getInstance().getModelManager().getFluidStateModelSet()
+                .get(stack.getFluid().defaultFluidState()).stillMaterial().sprite();
+    }
+
+    /**
+     * The ARGB tint of a fluid stack, or -1 if its model has no tint source.
+     */
+    public static int getFluidTint(FluidStack stack) {
+        var tintSource = Minecraft.getInstance().getModelManager().getFluidStateModelSet()
+                .get(stack.getFluid().defaultFluidState()).fluidTintSource();
+        return tintSource == null ? -1 : tintSource.colorAsStack(stack);
     }
 
     public static CCModel makeFluidModel(Cuboid6 bound, TextureAtlasSprite tex, double res) {
@@ -161,17 +175,7 @@ public class RenderUtils {
         builder.addVertex((float) c.max.x, (float) c.min.y, (float) c.max.z).setColor(r, g, b, a);
     }
 
-    @Deprecated
-    public static void bufferHitbox(Matrix4 mat, MultiBufferSource getter, Camera renderInfo, Cuboid6 cuboid) {
-        Vec3 projectedView = renderInfo.position();
-        bufferHitBox(mat.copy().translate(-projectedView.x, -projectedView.y, -projectedView.z), getter, cuboid);
-    }
 
-    @Deprecated
-    public static void bufferHitBox(Matrix4 mat, MultiBufferSource getter, Cuboid6 cuboid) {
-        VertexConsumer builder = new TransformingVertexConsumer(getter.getBuffer(RenderTypes.lines()), mat);
-        bufferCuboidOutline(builder, cuboid.copy().expand(0.0020000000949949026D), 0.0F, 0.0F, 0.0F, 0.4F);
-    }
 
     @Deprecated
     public static void bufferCuboidOutline(VertexConsumer builder, Cuboid6 c, float r, float g, float b, float a) {
@@ -189,17 +193,7 @@ public class RenderUtils {
         bufferLinePair(builder, c.min.x, c.min.y, c.max.z, c.min.x, c.max.y, c.max.z, r, g, b, a);
     }
 
-    @Deprecated
-    public static void bufferShapeHitBox(Matrix4 mat, MultiBufferSource buffers, Camera renderInfo, VoxelShape shape) {
-        Vec3 projectedView = renderInfo.position();
-        bufferShapeHitBox(mat.copy().translate(-projectedView.x, -projectedView.y, -projectedView.z), buffers, shape);
-    }
 
-    @Deprecated
-    public static void bufferShapeHitBox(Matrix4 mat, MultiBufferSource buffers, VoxelShape shape) {
-        VertexConsumer builder = new TransformingVertexConsumer(buffers.getBuffer(RenderTypes.lines()), mat);
-        bufferShapeOutline(builder, shape, 0.0F, 0.0F, 0.0F, 0.4F);
-    }
 
     @Deprecated
     public static void bufferShapeOutline(VertexConsumer builder, VoxelShape shape, float r, float g, float b, float a) {
