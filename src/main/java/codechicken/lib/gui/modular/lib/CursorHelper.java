@@ -1,27 +1,22 @@
 package codechicken.lib.gui.modular.lib;
 
 import codechicken.lib.CodeChickenLib;
-import net.minecraft.client.Minecraft;
+import com.mojang.blaze3d.platform.cursor.CursorType;
+import com.mojang.blaze3d.platform.cursor.CursorTypes;
+import java.util.HashMap;
+import java.util.Map;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.resources.Resource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWImage;
-import org.lwjgl.system.MemoryUtil;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * Created by brandon3055 on 11/5/20.
+ * <p>
+ * 26.3 moved windowing to SDL3 and selects the cursor every frame from
+ * {@link GuiGraphicsExtractor#requestCursor}, so custom GLFW image cursors are gone. The cursor ids map
+ * onto SDL system cursors instead, and {@link #requestCursor} must be called while extracting the gui.
  */
 public class CursorHelper {
     public static final Logger LOGGER = LogManager.getLogger();
@@ -32,69 +27,41 @@ public class CursorHelper {
     public static final Identifier RESIZE_TRBL = Identifier.fromNamespaceAndPath(CodeChickenLib.MOD_ID, "textures/gui/cursors/resize_diag_trbl.png");
     public static final Identifier RESIZE_TLBR = Identifier.fromNamespaceAndPath(CodeChickenLib.MOD_ID, "textures/gui/cursors/resize_diag_tlbr.png");
 
-    private static final Map<Identifier, Long> cursors = new HashMap<>();
-    private static Identifier active = null;
+    // SDL_SystemCursor ids, as used by vanilla's CursorTypes.
+    private static final int SDL_SYSTEM_CURSOR_NWSE_RESIZE = 5;
+    private static final int SDL_SYSTEM_CURSOR_NESW_RESIZE = 6;
 
-    private static long createCursor(Identifier cursorTexture) {
-        try {
-            Resource resource = Minecraft.getInstance().getResourceManager().getResource(cursorTexture).orElse(null);
-            if (resource == null) return MemoryUtil.NULL;
-            BufferedImage bufferedimage = ImageIO.read(resource.open());
-            GLFWImage glfwImage = imageToGLFWImage(bufferedimage);
-            return GLFW.glfwCreateCursor(glfwImage, 16, 16);
-        } catch (Exception e) {
-            LOGGER.warn("An error occurred while creating cursor", e);
-        }
-        return 0;
-    }
+    private static final Map<Identifier, CursorType> cursors = new HashMap<>();
+    private static @Nullable Identifier active = null;
 
-    private static GLFWImage imageToGLFWImage(BufferedImage image) {
-        if (image.getType() != BufferedImage.TYPE_INT_ARGB_PRE) {
-            final BufferedImage convertedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
-            final Graphics2D graphics = convertedImage.createGraphics();
-            final int targetWidth = image.getWidth();
-            final int targetHeight = image.getHeight();
-            graphics.drawImage(image, 0, 0, targetWidth, targetHeight, null);
-            graphics.dispose();
-            image = convertedImage;
-        }
-        final ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * 4);
-        for (int i = 0; i < image.getHeight(); i++) {
-            for (int j = 0; j < image.getWidth(); j++) {
-                int colorSpace = image.getRGB(j, i);
-                buffer.put((byte) ((colorSpace << 8) >> 24));
-                buffer.put((byte) ((colorSpace << 16) >> 24));
-                buffer.put((byte) ((colorSpace << 24) >> 24));
-                buffer.put((byte) (colorSpace >> 24));
-            }
-        }
-        buffer.flip();
-        final GLFWImage result = GLFWImage.create();
-        result.set(image.getWidth(), image.getHeight(), buffer);
-        return result;
+    private static CursorType createCursor(Identifier cursor) {
+        if (cursor.equals(DRAG)) return CursorTypes.RESIZE_ALL;
+        if (cursor.equals(RESIZE_H)) return CursorTypes.RESIZE_EW;
+        if (cursor.equals(RESIZE_V)) return CursorTypes.RESIZE_NS;
+        if (cursor.equals(RESIZE_TLBR)) return CursorType.createStandardCursor(SDL_SYSTEM_CURSOR_NWSE_RESIZE, "ccl_resize_nwse", CursorTypes.RESIZE_ALL);
+        if (cursor.equals(RESIZE_TRBL)) return CursorType.createStandardCursor(SDL_SYSTEM_CURSOR_NESW_RESIZE, "ccl_resize_nesw", CursorTypes.RESIZE_ALL);
+        LOGGER.warn("Unknown cursor {}, using the default cursor", cursor);
+        return CursorType.DEFAULT;
     }
 
     public static void setCursor(@Nullable Identifier cursor) {
-        if (cursor != active) {
-            active = cursor;
-            long window = Minecraft.getInstance().getWindow().handle();
-            long newCursor = active == null ? 0 : cursors.computeIfAbsent(cursor, CursorHelper::createCursor);
-            GLFW.glfwSetCursor(window, newCursor);
-        }
+        active = cursor;
     }
 
     public static void resetCursor() {
+        active = null;
+    }
+
+    /**
+     * Requests the active cursor for this frame. Call while extracting the gui.
+     */
+    public static void requestCursor(GuiGraphicsExtractor graphics) {
         if (active != null) {
-            setCursor(null);
+            graphics.requestCursor(cursors.computeIfAbsent(active, CursorHelper::createCursor));
         }
     }
 
     public static void onResourceReload() {
-        cursors.values().forEach(cursor -> {
-            if (cursor != MemoryUtil.NULL) {
-                GLFW.glfwDestroyCursor(cursor);
-            }
-        });
-        cursors.clear();
+        // System cursors don't depend on resources.
     }
 }

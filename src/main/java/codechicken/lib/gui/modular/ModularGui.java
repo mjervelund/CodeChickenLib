@@ -213,6 +213,7 @@ public class ModularGui implements GuiParent<ModularGui> {
         double mouseX = computeMouseX();
         double mouseY = computeMouseY();
         root.render(graphics, mouseX, mouseY, partialTicks);
+        CursorHelper.requestCursor(graphics);
     }
 
     /**

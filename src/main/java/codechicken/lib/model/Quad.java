@@ -18,6 +18,7 @@
 
 package codechicken.lib.model;
 
+import net.minecraft.client.resources.model.sprite.Material;
 import codechicken.lib.math.InterpHelper;
 import codechicken.lib.math.MathHelper;
 import codechicken.lib.vec.Cuboid6;
@@ -236,12 +237,14 @@ public class Quad {
                     colors.color(i)
             );
         }
-        tintIndex = quad.tintIndex();
+        var material = quad.materialInfo();
+        tintIndex = material.tintIndex();
         direction = quad.direction();
-        sprite = quad.sprite();
-        shade = quad.shade();
-        lightEmission = quad.lightEmission();
-        ambientOcclusion = quad.hasAmbientOcclusion();
+        sprite = material.sprite();
+        // 26.3 has no shade flag; unshaded quads use the UP face's (full) brightness via an override.
+        shade = material.shadeDirectionOverride() == null;
+        lightEmission = material.lightEmission();
+        ambientOcclusion = material.ambientOcclusion();
         return this;
     }
 
@@ -270,6 +273,15 @@ public class Quad {
      * @return The {@link BakedQuad}.
      */
     public BakedQuad bake() {
+        TextureAtlasSprite sprite = requireNonNull(this.sprite, "Quad requires a sprite.");
+        BakedQuad.MaterialInfo material = BakedQuad.MaterialInfo.of(
+                new Material.Baked(sprite, false),
+                sprite.transparency(),
+                tintIndex,
+                shade ? null : Direction.UP,
+                lightEmission,
+                ambientOcclusion
+        );
         return new BakedQuad(
                 vertices[0].vec.vector3f(),
                 vertices[1].vec.vector3f(),
@@ -279,11 +291,8 @@ public class Quad {
                 vertices[1].packUV(),
                 vertices[2].packUV(),
                 vertices[3].packUV(),
-                tintIndex,
                 requireNonNull(direction, "Direction not computed."),
-                requireNonNull(sprite, "Quad requires a sprite."),
-                shade,
-                lightEmission,
+                material,
                 BakedNormals.of(
                         vertices[0].packNormal(),
                         vertices[1].packNormal(),
@@ -295,8 +304,7 @@ public class Quad {
                         vertices[1].color,
                         vertices[2].color,
                         vertices[3].color
-                ),
-                ambientOcclusion
+                )
         );
     }
 
