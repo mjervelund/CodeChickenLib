@@ -1,5 +1,6 @@
 package codechicken.lib.render.model;
 
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import codechicken.lib.render.CCModel;
 import codechicken.lib.util.ResourceUtils;
 import codechicken.lib.vec.SwapYZ;
@@ -20,7 +21,7 @@ public class OBJParser {
 
     private final Identifier location;
     private final ResourceProvider provider;
-    private VertexFormat.Mode vertexMode = VertexFormat.Mode.TRIANGLES;
+    private PrimitiveTopology vertexMode = PrimitiveTopology.TRIANGLES;
     @Nullable
     private Transformation coordSystem;
     private boolean ignoreMtl;
@@ -43,13 +44,13 @@ public class OBJParser {
     }
 
     /**
-     * Set the {@link VertexFormat.Mode} to parse the OBJ model into.
+     * Set the {@link PrimitiveTopology} to parse the OBJ model into.
      *
      * @param mode The mode.
      * @return The same parser.
      */
-    public OBJParser vertexMode(VertexFormat.Mode mode) {
-        if (mode != VertexFormat.Mode.TRIANGLES && mode != VertexFormat.Mode.QUADS) {
+    public OBJParser vertexMode(PrimitiveTopology mode) {
+        if (mode != PrimitiveTopology.TRIANGLES && mode != PrimitiveTopology.QUADS) {
             throw new IllegalStateException("Only Quads and Triangles are supported.");
         }
         vertexMode = mode;
@@ -57,12 +58,12 @@ public class OBJParser {
     }
 
     /**
-     * Overload of {@link #vertexMode(VertexFormat.Mode)} passing {@link VertexFormat.Mode#QUADS}.
+     * Overload of {@link #vertexMode(PrimitiveTopology)} passing {@link PrimitiveTopology#QUADS}.
      *
      * @return The same parser.
      */
     public OBJParser quads() {
-        return vertexMode(VertexFormat.Mode.QUADS);
+        return vertexMode(PrimitiveTopology.QUADS);
     }
 
     /**
@@ -110,13 +111,13 @@ public class OBJParser {
      *
      * @param provider    The {@link ResourceProvider} to locate assets.
      * @param loc         The {@link Identifier} of the OBJ model.
-     * @param vertexMode  The {@link VertexFormat.Mode} to parse the model into.
+     * @param vertexMode  The {@link PrimitiveTopology} to parse the model into.
      * @param coordSystem The coordinate system transformation to apply during parsing.
      * @param ignoreMtl   If MTL files should be ignored.
      * @return The parsed models.
      */
-    public static Map<String, CCModel> parse(ResourceProvider provider, Identifier loc, VertexFormat.Mode vertexMode, @Nullable Transformation coordSystem, boolean ignoreMtl) {
-        if (vertexMode != VertexFormat.Mode.QUADS && vertexMode != VertexFormat.Mode.TRIANGLES) throw new IllegalStateException("Only Quads and Triangles are supported.");
+    public static Map<String, CCModel> parse(ResourceProvider provider, Identifier loc, PrimitiveTopology vertexMode, @Nullable Transformation coordSystem, boolean ignoreMtl) {
+        if (vertexMode != PrimitiveTopology.QUADS && vertexMode != PrimitiveTopology.TRIANGLES) throw new IllegalStateException("Only Quads and Triangles are supported.");
 
         Map<String, CCModel> builtModels = new HashMap<>();
 
@@ -222,7 +223,7 @@ public class OBJParser {
         return new Vector3(doubles);
     }
 
-    private static List<int[]> parsePolys(String s, VertexFormat.Mode vm) {
+    private static List<int[]> parsePolys(String s, PrimitiveTopology vm) {
         String[] av = s.split(" ");
         int[][] polyVerts = new int[av.length][3];
         for (int i = 0; i < av.length; i++) {
@@ -234,7 +235,7 @@ public class OBJParser {
             }
         }
         List<int[]> polys = new ArrayList<>();
-        if (vm == VertexFormat.Mode.TRIANGLES) {
+        if (vm == PrimitiveTopology.TRIANGLES) {
             triangulate(polys, polyVerts);
         } else {
             quadulate(polys, polyVerts);

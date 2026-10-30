@@ -1,5 +1,6 @@
 package codechicken.lib.render;
 
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import codechicken.lib.vec.Quat;
 import codechicken.lib.vec.Vector3;
 import codechicken.lib.vec.Vertex5;
@@ -42,8 +43,8 @@ public class CCModelLibrary {
             quat.rotate(vec);
         }
 
-        icosahedron4 = CCModel.newModel(VertexFormat.Mode.TRIANGLES, 60);
-        icosahedron7 = CCModel.newModel(VertexFormat.Mode.QUADS, 80);
+        icosahedron4 = CCModel.newModel(PrimitiveTopology.TRIANGLES, 60);
+        icosahedron7 = CCModel.newModel(PrimitiveTopology.QUADS, 80);
 
         i = 0;
         //top

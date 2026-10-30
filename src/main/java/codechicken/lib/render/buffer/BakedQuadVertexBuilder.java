@@ -1,5 +1,6 @@
 package codechicken.lib.render.buffer;
 
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import codechicken.lib.model.Quad;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.renderpearl.api.vertex.VertexFormat;
@@ -20,7 +21,7 @@ import java.util.List;
 public class BakedQuadVertexBuilder implements VertexConsumer, ISpriteAwareVertexConsumer {
 
     private final List<BakedQuad> quadList = new ArrayList<>();
-    private final VertexFormat.Mode mode;
+    private final PrimitiveTopology mode;
 
     private boolean shade = false;
     private boolean ambientOcclusion = true;
@@ -29,11 +30,11 @@ public class BakedQuadVertexBuilder implements VertexConsumer, ISpriteAwareVerte
     private int vertex = -1;
 
     public BakedQuadVertexBuilder() {
-        this(VertexFormat.Mode.QUADS);
+        this(PrimitiveTopology.QUADS);
     }
 
-    public BakedQuadVertexBuilder(VertexFormat.Mode mode) {
-        if (mode != VertexFormat.Mode.QUADS && mode != VertexFormat.Mode.TRIANGLES) {
+    public BakedQuadVertexBuilder(PrimitiveTopology mode) {
+        if (mode != PrimitiveTopology.QUADS && mode != PrimitiveTopology.TRIANGLES) {
             throw new IllegalArgumentException("Only QUADS or TRIANGLES supported. Got: " + mode);
         }
         this.mode = mode;
@@ -111,7 +112,7 @@ public class BakedQuadVertexBuilder implements VertexConsumer, ISpriteAwareVerte
     private void endPrevVertex() {
         vertex++;
         if (vertex == mode.primitiveLength) {
-            if (mode == VertexFormat.Mode.TRIANGLES) {
+            if (mode == PrimitiveTopology.TRIANGLES) {
                 // Quadulate.
                 current.vertices[3].copyFrom(current.vertices[2]);
             }

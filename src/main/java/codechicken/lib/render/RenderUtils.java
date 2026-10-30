@@ -1,5 +1,6 @@
 package codechicken.lib.render;
 
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import codechicken.lib.render.buffer.TransformingVertexConsumer;
 import codechicken.lib.vec.*;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -50,7 +51,7 @@ public class RenderUtils {
     }
 
     public static CCModel makeFluidModel(Cuboid6 bound, TextureAtlasSprite tex, double res) {
-        CCModel model = CCModel.newModel(VertexFormat.Mode.QUADS);
+        CCModel model = CCModel.newModel(PrimitiveTopology.QUADS);
         List<Vertex5> verts = new ArrayList<>();
         makeFluidCuboid(verts, bound, tex, res);
         model.verts = verts.toArray(new Vertex5[0]);

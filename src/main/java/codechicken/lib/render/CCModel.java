@@ -1,5 +1,6 @@
 package codechicken.lib.render;
 
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
 import codechicken.lib.render.lighting.LC;
 import codechicken.lib.render.lighting.LightModel;
 import codechicken.lib.render.model.ModelMaterial;
@@ -23,18 +24,18 @@ import static net.covers1624.quack.util.SneakyUtils.unsafeCast;
 
 public class CCModel implements IVertexSource, Copyable<CCModel> {
 
-    public final VertexFormat.Mode vertexMode;
+    public final PrimitiveTopology vertexMode;
     public final int vp;
     public Vertex5[] verts;
     public ArrayList<Object> attributes = new ArrayList<>();
 
-    protected CCModel(VertexFormat.Mode vertexMode, int numVerts) {
-        if (vertexMode != VertexFormat.Mode.QUADS && vertexMode != VertexFormat.Mode.TRIANGLES) {
+    protected CCModel(PrimitiveTopology vertexMode, int numVerts) {
+        if (vertexMode != PrimitiveTopology.QUADS && vertexMode != PrimitiveTopology.TRIANGLES) {
             throw new IllegalArgumentException("Models must be QUADS or TRIANGLES");
         }
 
         this.vertexMode = vertexMode;
-        vp = vertexMode == VertexFormat.Mode.QUADS ? 4 : 3;
+        vp = vertexMode == PrimitiveTopology.QUADS ? 4 : 3;
         verts = new Vertex5[numVerts];
     }
 
@@ -496,23 +497,23 @@ public class CCModel implements IVertexSource, Copyable<CCModel> {
     }
 
     public static CCModel quadModel(int numVerts) {
-        return newModel(VertexFormat.Mode.QUADS, numVerts);
+        return newModel(PrimitiveTopology.QUADS, numVerts);
     }
 
     public static CCModel triModel(int numVerts) {
-        return newModel(VertexFormat.Mode.TRIANGLES, numVerts);
+        return newModel(PrimitiveTopology.TRIANGLES, numVerts);
     }
 
-    public static CCModel newModel(VertexFormat.Mode vertexMode) {
+    public static CCModel newModel(PrimitiveTopology vertexMode) {
         return newModel(vertexMode, 0);
     }
 
-    public static CCModel newModel(VertexFormat.Mode vertexMode, int numVerts) {
+    public static CCModel newModel(PrimitiveTopology vertexMode, int numVerts) {
         return new CCModel(vertexMode, numVerts);
     }
 
-    public static CCModel createModel(List<Vector3> verts, List<Vector3> uvs, List<Vector3> normals, VertexFormat.Mode vertexMode, List<int[]> polys) {
-        int vp = vertexMode == VertexFormat.Mode.QUADS ? 4 : 3;
+    public static CCModel createModel(List<Vector3> verts, List<Vector3> uvs, List<Vector3> normals, PrimitiveTopology vertexMode, List<int[]> polys) {
+        int vp = vertexMode == PrimitiveTopology.QUADS ? 4 : 3;
         if (polys.size() < vp || polys.size() % vp != 0) {
             throw new IllegalArgumentException("Invalid number of vertices for model: " + polys.size());
         }
@@ -761,7 +762,7 @@ public class CCModel implements IVertexSource, Copyable<CCModel> {
         if (models.isEmpty()) throw new IllegalArgumentException("Can't combine an empty collection of models.");
 
         int numVerts = 0;
-        VertexFormat.Mode vertexMode = null;
+        PrimitiveTopology vertexMode = null;
         for (CCModel model : models) {
             if (vertexMode == null) {
                 vertexMode = model.vertexMode;

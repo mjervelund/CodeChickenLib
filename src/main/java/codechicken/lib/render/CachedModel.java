@@ -135,7 +135,7 @@
 //    }
 //
 //    // Mostly mirrors RenderSystem.AutoStorageIndexBuffer, however, does not over-provision the buffer.
-//    private IndexBuffer buildIndexBuffer(@Nullable GpuBuffer indexBuffer, VertexFormat.Mode mode, int indexCount) {
+//    private IndexBuffer buildIndexBuffer(@Nullable GpuBuffer indexBuffer, PrimitiveTopology mode, int indexCount) {
 //        var gen = getGenForMode(mode);
 //
 //        var type = VertexFormat.IndexType.least(indexCount);
@@ -167,7 +167,7 @@
 //        }
 //    }
 //
-//    private static IndexGen getGenForMode(VertexFormat.Mode mode) {
+//    private static IndexGen getGenForMode(PrimitiveTopology mode) {
 //        return switch (mode) {
 //            case QUADS -> new IndexGen(4, 6, (cons, i) -> {
 //                cons.accept(i);
