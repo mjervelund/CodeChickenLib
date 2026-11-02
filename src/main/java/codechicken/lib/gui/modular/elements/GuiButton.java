@@ -1,5 +1,6 @@
 package codechicken.lib.gui.modular.elements;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import codechicken.lib.gui.modular.lib.Constraints;
 import codechicken.lib.gui.modular.lib.geometry.Constraint;
 import codechicken.lib.gui.modular.lib.geometry.GuiParent;
@@ -26,9 +27,10 @@ import static codechicken.lib.gui.modular.lib.geometry.GeoParam.*;
  */
 public class GuiButton extends GuiElement<GuiButton> {
 
-    public static final int LEFT_CLICK = 0;
-    public static final int RIGHT_CLICK = 1;
-    public static final int MIDDLE_CLICK = 2;
+    // 26.3 numbers mouse buttons like SDL (left 1, middle 2, right 3), not GLFW (left 0, right 1, middle 2).
+    public static final int LEFT_CLICK = InputConstants.MOUSE_BUTTON_LEFT;
+    public static final int RIGHT_CLICK = InputConstants.MOUSE_BUTTON_RIGHT;
+    public static final int MIDDLE_CLICK = InputConstants.MOUSE_BUTTON_MIDDLE;
 
     private final Map<Integer, Runnable> onClick = new HashMap<>();
     private final Map<Integer, Runnable> onPress = new HashMap<>();
