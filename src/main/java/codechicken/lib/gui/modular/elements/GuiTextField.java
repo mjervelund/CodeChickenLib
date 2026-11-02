@@ -589,7 +589,7 @@ public class GuiTextField extends GuiElement<GuiTextField> implements Background
             setFocus(isFocusable.get());
         }
 
-        if (isFocused() && mouseOver && event.button() == 0) {
+        if (isFocused() && mouseOver && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             int i = (int) (Mth.floor(event.x()) - xMin());
             String s = font().plainSubstrByWidth(getValue().substring(displayPos), (int) xSize());
             moveCursorTo(font().plainSubstrByWidth(s, i).length() + displayPos);

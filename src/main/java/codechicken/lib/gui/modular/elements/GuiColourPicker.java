@@ -1,5 +1,6 @@
 package codechicken.lib.gui.modular.elements;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import codechicken.lib.colour.Colour;
 import codechicken.lib.gui.modular.lib.*;
 import codechicken.lib.gui.modular.lib.geometry.Axis;
@@ -175,13 +176,13 @@ public class GuiColourPicker extends GuiManipulable {
 
         @Override
         public boolean mouseClicked(MouseButtonEvent event, boolean consumed) {
-            pressed = event.button() == 0;
+            pressed = event.button() == InputConstants.MOUSE_BUTTON_LEFT;
             return super.mouseClicked(event, consumed);
         }
 
         @Override
         public boolean mouseReleased(MouseButtonEvent event, boolean consumed) {
-            if (event.button() == 0) pressed = false;
+            if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) pressed = false;
             return super.mouseReleased(event, consumed);
         }
 
