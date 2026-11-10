@@ -15,14 +15,25 @@ import java.util.concurrent.TimeUnit;
  */
 public class VoxelShapeCache {
 
+    // Size bounds (https://github.com/TheCBProject/CodeChickenLib/issues/473). Callers are meant to pass cached
+    // shapes, but a caller that builds a fresh VoxelShape per query (identity equality) misses every time, and
+    // multipart tiles merge one set per distinct part combination on every shape query. With only an access expiry
+    // each such key was held for 2 hours, so a busy world grew these caches without limit. Single-box shapes are
+    // small, so their caches get a generous bound; merged shapes are larger and recomputing one is cheap.
+    private static final int BOX_CACHE_SIZE = 16384;
+    private static final int MERGE_CACHE_SIZE = 4096;
+
     private static final Cache<AABB, VoxelShape> bbToShapeCache = CacheBuilder.newBuilder()
+            .maximumSize(BOX_CACHE_SIZE)
             .expireAfterAccess(2, TimeUnit.HOURS)
             .build();
     private static final Cache<Cuboid6, VoxelShape> cuboidToShapeCache = CacheBuilder.newBuilder()
+            .maximumSize(BOX_CACHE_SIZE)
             .expireAfterAccess(2, TimeUnit.HOURS)
             .build();
 
     private static final Cache<ImmutableSet<VoxelShape>, VoxelShape> mergeShapeCache = CacheBuilder.newBuilder()
+            .maximumSize(MERGE_CACHE_SIZE)
             .expireAfterAccess(2, TimeUnit.HOURS)
             .build();
 
